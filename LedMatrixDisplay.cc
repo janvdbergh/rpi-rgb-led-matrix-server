@@ -4,13 +4,15 @@
 
 const int DIGIT_START_X = 7;
 const int DIGIT_START_Y = 12;
+const char *BDF_FONT_FILE = "fonts/6x9.bdf";
 
 using namespace rgb_matrix;
 
-LedMatrixDisplay::LedMatrixDisplay() : _rgbMatrix(0), _frameCanvas(0), _color(255, 255, 255) {}
+LedMatrixDisplay::LedMatrixDisplay() : _rgbMatrix(0), _frameCanvas(0), _color(255, 255, 255), _smallFont(0) {}
 
 LedMatrixDisplay::~LedMatrixDisplay() {
     delete _rgbMatrix;
+    delete _smallFont;
 }
 
 bool LedMatrixDisplay::Initialize(int argc, char *argv[]) {
@@ -31,6 +33,12 @@ bool LedMatrixDisplay::Initialize(int argc, char *argv[]) {
     }
 
     _frameCanvas = _rgbMatrix->CreateFrameCanvas();
+
+    _smallFont = new Font();
+    if (!_smallFont->LoadFont(BDF_FONT_FILE)) {
+        std::cerr <<  "Could not load font " << BDF_FONT_FILE << std::endl;
+        return false;
+    }
 
     return true;
 }
@@ -95,6 +103,10 @@ void LedMatrixDisplay::DrawDigit(int position, int digit) {
     if (digit==0 || digit==1 || digit==3 || digit==4 || digit==5 || digit==6 || digit==7 || digit==8 || digit==9) {
         DrawRectangle(startX + 8, DIGIT_START_Y + 8, 2, 10);
     }
+}
+
+void LedMatrixDisplay::DrawSmallText(int x, int y, std::string text) {
+    DrawText(_frameCanvas, *_smallFont, x, y, _color, text.c_str());
 }
 
 void LedMatrixDisplay::Show() {
