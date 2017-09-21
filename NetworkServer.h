@@ -6,14 +6,15 @@
 
 class NetworkServer {
 public:
-    NetworkServer(LedMatrixDisplay& ledMatrixDisplay): _ledMatrixDisplay(ledMatrixDisplay) {}
+    NetworkServer(LedMatrixDisplay& ledMatrixDisplay): _ledMatrixDisplay(ledMatrixDisplay), _messages("") {}
 
     void RunServer(int port);
 private:
     LedMatrixDisplay& _ledMatrixDisplay;
+    std::string _messages;
 
     void handleClientConnection(int serverSocket);
-    void handleMessage(std::string message);
+    void handleMessage();
 };
 
 #endif //DISPLAYSERVER_NETWORK_SERVER_H

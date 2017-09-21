@@ -55,9 +55,11 @@ void NetworkServer::handleClientConnection(int serverSocket) {
     bzero(buffer, 256);
 
     int bytesRead = read(clientSocket, buffer, 255);
-    while (bytesRead>0) {
+    while (bytesRead > 0) {
         buffer[bytesRead] = '\0';
-        handleMessage(buffer);
+        _messages = _messages + std::string(buffer);
+        handleMessage();
+
         bytesRead = read(clientSocket, buffer, 255);
     }
     if (bytesRead < 0) {
@@ -66,43 +68,49 @@ void NetworkServer::handleClientConnection(int serverSocket) {
     close(clientSocket);
 }
 
-void NetworkServer::handleMessage(std::string message) {
-    std::smatch match;
+void NetworkServer::handleMessage() {
+    size_t index = _messages.find('\n');
+    while(index != std::string::npos) {
+        std::string message = _messages.substr(0, index);
+        _messages = _messages.substr(index + 1);
+        index = _messages.find('\n');
 
-    if (regex_match(message, REGEX_CLEAR)) {
-        std::cout << "Clear" << std::endl;
-        _ledMatrixDisplay.Clear();
-    } else if (regex_match(message, REGEX_SHOW)) {
-        std::cout << "Show" << std::endl;
-        _ledMatrixDisplay.Show();
-    } else if (regex_match(message, match, REGEX_COLOR)) {
-        std::cout << "Color" << std::endl;
-        int r = atoi(match[1].str().c_str());
-        int g = atoi(match[2].str().c_str());
-        int b = atoi(match[3].str().c_str());
+        std::smatch match;
+        if (regex_match(message, REGEX_CLEAR)) {
+            std::cout << "Clear" << std::endl;
+            _ledMatrixDisplay.Clear();
+        } else if (regex_match(message, REGEX_SHOW)) {
+            std::cout << "Show" << std::endl;
+            _ledMatrixDisplay.Show();
+        } else if (regex_match(message, match, REGEX_COLOR)) {
+            std::cout << "Color" << std::endl;
+            int r = atoi(match[1].str().c_str());
+            int g = atoi(match[2].str().c_str());
+            int b = atoi(match[3].str().c_str());
 
-        _ledMatrixDisplay.SetColor(r, g, b);
-    } else if (regex_match(message, match, REGEX_PIXEL)) {
-        std::cout << "Pixel" << std::endl;
-        int x = atoi(match[1].str().c_str());
-        int y = atoi(match[2].str().c_str());
+            _ledMatrixDisplay.SetColor(r, g, b);
+        } else if (regex_match(message, match, REGEX_PIXEL)) {
+            std::cout << "Pixel" << std::endl;
+            int x = atoi(match[1].str().c_str());
+            int y = atoi(match[2].str().c_str());
 
-        _ledMatrixDisplay.DrawPixel(x, y);
-    } else if (regex_match(message, match, REGEX_RECTANGLE)) {
-        std::cout << "Rectangle" << std::endl;
-        int x = atoi(match[1].str().c_str());
-        int y = atoi(match[2].str().c_str());
-        int width = atoi(match[3].str().c_str());
-        int height = atoi(match[4].str().c_str());
+            _ledMatrixDisplay.DrawPixel(x, y);
+        } else if (regex_match(message, match, REGEX_RECTANGLE)) {
+            std::cout << "Rectangle" << std::endl;
+            int x = atoi(match[1].str().c_str());
+            int y = atoi(match[2].str().c_str());
+            int width = atoi(match[3].str().c_str());
+            int height = atoi(match[4].str().c_str());
 
-        _ledMatrixDisplay.DrawRectangle(x, y, width, height);
-    } else if (regex_match(message, match, REGEX_DIGIT)) {
-        std::cout << "Digit" << std::endl;
-        int position = atoi(match[1].str().c_str());
-        int digit = atoi(match[2].str().c_str());
+            _ledMatrixDisplay.DrawRectangle(x, y, width, height);
+        } else if (regex_match(message, match, REGEX_DIGIT)) {
+            std::cout << "Digit" << std::endl;
+            int position = atoi(match[1].str().c_str());
+            int digit = atoi(match[2].str().c_str());
 
-        _ledMatrixDisplay.DrawDigit(position, digit);
-    } else {
-        std::cerr << "Invalid message **" << message << "**" << std::endl;
+            _ledMatrixDisplay.DrawDigit(position, digit);
+        } else {
+            std::cerr << "Invalid message **" << message << "**" << std::endl;
+        }
     }
 }
