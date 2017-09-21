@@ -1,10 +1,10 @@
-CFLAGS=-Wall -O3 -g
+CFLAGS=-Wall -O3 -g -std=c++11
 CXXFLAGS=$(CFLAGS)
 LDFLAGS+=-lrgbmatrix  -lrt -lm -lpthread
 
 all : bin/displayserver
 
-bin/displayserver : obj/Main.o obj/LedMatrixDisplay.o
+bin/displayserver : obj/Main.o obj/LedMatrixDisplay.o obj/NetworkServer.o
 	mkdir -p bin
 	$(CXX) $^ -o $@ $(LDFLAGS)
 

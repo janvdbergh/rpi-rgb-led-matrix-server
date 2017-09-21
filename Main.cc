@@ -2,6 +2,7 @@
 #include <unistd.h>
 
 #include "LedMatrixDisplay.h"
+#include "NetworkServer.h"
 
 int main(int argc, char* argv[]) {
     LedMatrixDisplay ledMatrixDisplay;
@@ -9,14 +10,8 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    ledMatrixDisplay.Clear();
-    ledMatrixDisplay.DrawDigit(0, 0);
-    ledMatrixDisplay.DrawDigit(1, 8);
-    ledMatrixDisplay.DrawDigit(2, 1);
-    ledMatrixDisplay.DrawDigit(3, 1);
-    ledMatrixDisplay.Show();
-
-    sleep(2);
+    NetworkServer networkServer(ledMatrixDisplay);
+    networkServer.RunServer(1236);
 
     return 0;
 }

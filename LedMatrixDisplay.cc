@@ -98,5 +98,5 @@ void LedMatrixDisplay::DrawDigit(int position, int digit) {
 }
 
 void LedMatrixDisplay::Show() {
-    _rgbMatrix->SwapOnVSync(_frameCanvas);
+    _frameCanvas = _rgbMatrix->SwapOnVSync(_frameCanvas);
 }
