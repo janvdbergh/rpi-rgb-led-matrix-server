@@ -17,12 +17,14 @@ public:
     void DrawPixel(int x, int y);
     void DrawRectangle(int x, int y, int width, int height);
     void DrawDigit(int position, int digit);
+    void DrawSmallText(int x, int y, std::string text);
 
     void Show();
 private:
     rgb_matrix::RGBMatrix* _rgbMatrix;
     rgb_matrix::FrameCanvas *_frameCanvas;
     rgb_matrix::Color _color;
+    rgb_matrix::Font* _smallFont;
 };
 
 #endif //DISPLAYSERVER_LEDMATRIXDISPLAY_H
