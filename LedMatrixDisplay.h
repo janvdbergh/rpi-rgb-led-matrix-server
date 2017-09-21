@@ -18,6 +18,7 @@ public:
     void DrawRectangle(int x, int y, int width, int height);
     void DrawDigit(int position, int digit);
     void DrawSmallText(int x, int y, std::string text);
+    void DrawLargeText(int x, int y, std::string text);
 
     void Show();
 private:
@@ -25,6 +26,7 @@ private:
     rgb_matrix::FrameCanvas *_frameCanvas;
     rgb_matrix::Color _color;
     rgb_matrix::Font* _smallFont;
+    rgb_matrix::Font* _largeFont;
 };
 
 #endif //DISPLAYSERVER_LEDMATRIXDISPLAY_H

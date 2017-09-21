@@ -16,7 +16,8 @@ std::basic_regex<char> REGEX_SHOW("^show\\s*");
 std::basic_regex<char> REGEX_PIXEL("^pixel (\\d+) (\\d+)\\s*");
 std::basic_regex<char> REGEX_RECTANGLE("^rectangle (\\d+) (\\d+) (\\d+) (\\d+)\\s*");
 std::basic_regex<char> REGEX_DIGIT("^digit (\\d+) (\\d+)\\s*");
-std::basic_regex<char> REGEX_TEXT("^text (\\d+) (\\d+) \"([^\"]*)\"\\s*");
+std::basic_regex<char> REGEX_SMALL_TEXT("^smalltext (\\d+) (\\d+) \"([^\"]*)\"\\s*");
+std::basic_regex<char> REGEX_LARGE_TEXT("^largetext (-?\\d+) (-?\\d+) \"([^\"]*)\"\\s*");
 
 void NetworkServer::RunServer(int port) {
     int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
@@ -105,12 +106,18 @@ void NetworkServer::handleMessage() {
             int digit = atoi(match[2].str().c_str());
 
             _ledMatrixDisplay.DrawDigit(position, digit);
-        }  else if (regex_match(message, match, REGEX_TEXT)) {
+        } else if (regex_match(message, match, REGEX_SMALL_TEXT)) {
             int x = atoi(match[1].str().c_str());
             int y = atoi(match[2].str().c_str());
             std::string text = match[3].str();
 
             _ledMatrixDisplay.DrawSmallText(x, y, text);
+        } else if (regex_match(message, match, REGEX_LARGE_TEXT)) {
+            int x = atoi(match[1].str().c_str());
+            int y = atoi(match[2].str().c_str());
+            std::string text = match[3].str();
+
+            _ledMatrixDisplay.DrawLargeText(x, y, text);
         } else {
             std::cerr << "Invalid message **" << message << "**" << std::endl;
         }
