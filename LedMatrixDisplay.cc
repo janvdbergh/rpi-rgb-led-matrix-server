@@ -1,5 +1,4 @@
 #include <iostream>
-#include <stdio.h>
 #include "LedMatrixDisplay.h"
 
 const int DIGIT_START_X = 7;
@@ -9,7 +8,7 @@ const char *BDF_LARGE_FONT_FILE = "fonts/9x18.bdf";
 
 using namespace rgb_matrix;
 
-LedMatrixDisplay::LedMatrixDisplay() : _rgbMatrix(0), _frameCanvas(0), _color(255, 255, 255), _smallFont(0), _largeFont(0) {}
+LedMatrixDisplay::LedMatrixDisplay() : _rgbMatrix(nullptr), _frameCanvas(nullptr), _color(255, 255, 255), _smallFont(nullptr), _largeFont(nullptr) {}
 
 LedMatrixDisplay::~LedMatrixDisplay() {
     delete _rgbMatrix;
@@ -27,7 +26,7 @@ bool LedMatrixDisplay::Initialize(int argc, char *argv[]) {
     runtimeOptions.gpio_slowdown = 2;
     _rgbMatrix = rgb_matrix::CreateMatrixFromFlags(&argc, &argv, &options, &runtimeOptions);
 
-    if (_rgbMatrix == 0) {
+    if (_rgbMatrix == nullptr) {
         std::cerr << "Could not initialize matrix" << std::endl;
         rgb_matrix::PrintMatrixFlags(stderr);
         return false;
