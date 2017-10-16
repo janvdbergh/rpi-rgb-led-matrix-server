@@ -1,1 +1,1 @@
-add_library(led-matrix-display LedMatrixDisplay.cc)
+add_library(led-matrix-display LedMatrixDisplay.cpp)

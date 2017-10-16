@@ -10,6 +10,6 @@ link_directories(${RPI_RGB_LED_MATRIX_DIR}/lib)
 add_subdirectory(led-matrix-display)
 
 # Main executable
-add_executable(DisplayServer Main.cc NetworkServer.cc)
+add_executable(DisplayServer Main.cpp NetworkServer.cpp)
 target_link_libraries(DisplayServer led-matrix-display rgbmatrix)
 
