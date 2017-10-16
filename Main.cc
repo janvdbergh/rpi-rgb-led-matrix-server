@@ -1,7 +1,4 @@
-#include <iostream>
-#include <unistd.h>
-
-#include "LedMatrixDisplay.h"
+#include "led-matrix-display/LedMatrixDisplay.h"
 #include "NetworkServer.h"
 
 int main(int argc, char* argv[]) {

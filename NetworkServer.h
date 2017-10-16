@@ -2,11 +2,11 @@
 #define DISPLAYSERVER_NETWORK_SERVER_H
 
 #include <string>
-#include "LedMatrixDisplay.h"
+#include "led-matrix-display/LedMatrixDisplay.h"
 
 class NetworkServer {
 public:
-    NetworkServer(LedMatrixDisplay& ledMatrixDisplay): _ledMatrixDisplay(ledMatrixDisplay), _messages("") {}
+    explicit NetworkServer(LedMatrixDisplay& ledMatrixDisplay): _ledMatrixDisplay(ledMatrixDisplay), _messages("") {}
 
     void RunServer(int port);
 private:
