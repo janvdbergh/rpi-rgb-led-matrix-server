@@ -124,6 +124,6 @@ void LedMatrixDisplay::Show() {
     _frameCanvas = _rgbMatrix->SwapOnVSync(_frameCanvas);
 }
 
-displays::Display* displays::createDisplay() {
+Display* displays::createDisplay() {
     return new LedMatrixDisplay();
 }

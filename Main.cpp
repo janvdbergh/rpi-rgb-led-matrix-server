@@ -1,5 +1,5 @@
 #include <memory>
-#include "led-matrix-display/Display.h"
+#include "displays/Display.h"
 #include "NetworkServer.h"
 
 int main(int argc, char* argv[]) {
