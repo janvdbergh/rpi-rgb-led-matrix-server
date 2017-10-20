@@ -7,6 +7,7 @@ const char *BDF_SMALL_FONT_FILE = "fonts/6x9.bdf";
 const char *BDF_LARGE_FONT_FILE = "fonts/9x18.bdf";
 
 using namespace rgb_matrix;
+using namespace displays;
 
 LedMatrixDisplay::LedMatrixDisplay() : _rgbMatrix(nullptr), _frameCanvas(nullptr), _color(255, 255, 255), _smallFont(nullptr), _largeFont(nullptr) {}
 
@@ -121,4 +122,8 @@ void LedMatrixDisplay::DrawLargeText(int x, int y, std::string text) {
 
 void LedMatrixDisplay::Show() {
     _frameCanvas = _rgbMatrix->SwapOnVSync(_frameCanvas);
+}
+
+displays::Display* displays::createDisplay() {
+    return new LedMatrixDisplay();
 }

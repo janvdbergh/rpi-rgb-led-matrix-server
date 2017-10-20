@@ -1,13 +1,14 @@
-#include "led-matrix-display/LedMatrixDisplay.h"
+#include <memory>
+#include "led-matrix-display/Display.h"
 #include "NetworkServer.h"
 
 int main(int argc, char* argv[]) {
-    LedMatrixDisplay ledMatrixDisplay;
-    if (!ledMatrixDisplay.Initialize(argc, argv)) {
+    std::unique_ptr<displays::Display> display(displays::createDisplay());
+    if (!display->Initialize(argc, argv)) {
         return 1;
     }
 
-    NetworkServer networkServer(ledMatrixDisplay);
+    NetworkServer networkServer(display);
     networkServer.RunServer(1236);
 
     return 0;

@@ -2,18 +2,22 @@
 #define DISPLAYSERVER_NETWORK_SERVER_H
 
 #include <string>
-#include "led-matrix-display/LedMatrixDisplay.h"
+#include "led-matrix-display/Display.h"
 
 class NetworkServer {
 public:
-    explicit NetworkServer(LedMatrixDisplay& ledMatrixDisplay): _ledMatrixDisplay(ledMatrixDisplay), _messages("") {}
+    explicit NetworkServer(std::unique_ptr<displays::Display> &display) : _messages("") {
+        _display = std::move(display);
+    }
 
     void RunServer(int port);
+
 private:
-    LedMatrixDisplay& _ledMatrixDisplay;
+    std::unique_ptr<displays::Display> _display;
     std::string _messages;
 
     void handleClientConnection(int serverSocket);
+
     void handleMessage();
 };
 

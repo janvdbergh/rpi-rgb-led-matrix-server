@@ -79,44 +79,44 @@ void NetworkServer::handleMessage() {
 
         std::smatch match;
         if (regex_match(message, REGEX_CLEAR)) {
-            _ledMatrixDisplay.Clear();
+            _display->Clear();
         } else if (regex_match(message, REGEX_SHOW)) {
-            _ledMatrixDisplay.Show();
+            _display->Show();
         } else if (regex_match(message, match, REGEX_COLOR)) {
             int r = atoi(match[1].str().c_str());
             int g = atoi(match[2].str().c_str());
             int b = atoi(match[3].str().c_str());
 
-            _ledMatrixDisplay.SetColor(r, g, b);
+            _display->SetColor(r, g, b);
         } else if (regex_match(message, match, REGEX_PIXEL)) {
             int x = atoi(match[1].str().c_str());
             int y = atoi(match[2].str().c_str());
 
-            _ledMatrixDisplay.DrawPixel(x, y);
+            _display->DrawPixel(x, y);
         } else if (regex_match(message, match, REGEX_RECTANGLE)) {
             int x = atoi(match[1].str().c_str());
             int y = atoi(match[2].str().c_str());
             int width = atoi(match[3].str().c_str());
             int height = atoi(match[4].str().c_str());
 
-            _ledMatrixDisplay.DrawRectangle(x, y, width, height);
+            _display->DrawRectangle(x, y, width, height);
         } else if (regex_match(message, match, REGEX_DIGIT)) {
             int position = atoi(match[1].str().c_str());
             int digit = atoi(match[2].str().c_str());
 
-            _ledMatrixDisplay.DrawDigit(position, digit);
+            _display->DrawDigit(position, digit);
         } else if (regex_match(message, match, REGEX_SMALL_TEXT)) {
             int x = atoi(match[1].str().c_str());
             int y = atoi(match[2].str().c_str());
             std::string text = match[3].str();
 
-            _ledMatrixDisplay.DrawSmallText(x, y, text);
+            _display->DrawSmallText(x, y, text);
         } else if (regex_match(message, match, REGEX_LARGE_TEXT)) {
             int x = atoi(match[1].str().c_str());
             int y = atoi(match[2].str().c_str());
             std::string text = match[3].str();
 
-            _ledMatrixDisplay.DrawLargeText(x, y, text);
+            _display->DrawLargeText(x, y, text);
         } else {
             std::cerr << "Invalid message **" << message << "**" << std::endl;
         }
