@@ -14,3 +14,10 @@ add_executable(DisplayServerLed
         displays/LedMatrixDisplay.cpp
         )
 target_link_libraries(DisplayServerLed rgbmatrix)
+
+add_executable(DisplayServerMock
+        Main.cpp
+        server/NetworkServer.cpp
+        displays/Display.cpp
+        displays/MockDisplay.cpp
+        )
