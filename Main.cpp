@@ -1,6 +1,6 @@
 #include <memory>
 #include "displays/Display.h"
-#include "NetworkServer.h"
+#include "server/NetworkServer.h"
 
 int main(int argc, char* argv[]) {
     std::unique_ptr<displays::Display> display(displays::createDisplay());

@@ -9,7 +9,7 @@ link_directories(${RPI_RGB_LED_MATRIX_DIR}/lib)
 
 add_executable(DisplayServerLed
         Main.cpp
-        NetworkServer.cpp
+        server/NetworkServer.cpp
         displays/Display.cpp
         displays/LedMatrixDisplay.cpp
         )

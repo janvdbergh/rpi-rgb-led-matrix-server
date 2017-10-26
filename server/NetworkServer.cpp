@@ -55,7 +55,7 @@ void NetworkServer::handleClientConnection(int serverSocket) {
     char buffer[256];
     bzero(buffer, 256);
 
-    int bytesRead = read(clientSocket, buffer, 255);
+    ssize_t bytesRead = read(clientSocket, buffer, 255);
     while (bytesRead > 0) {
         buffer[bytesRead] = '\0';
         _messages = _messages + std::string(buffer);

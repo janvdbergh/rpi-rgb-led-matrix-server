@@ -2,7 +2,7 @@
 #define DISPLAYSERVER_NETWORK_SERVER_H
 
 #include <string>
-#include "displays/Display.h"
+#include "../displays/Display.h"
 
 class NetworkServer {
 public:
