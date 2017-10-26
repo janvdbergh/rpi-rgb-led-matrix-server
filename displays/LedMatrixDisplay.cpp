@@ -9,13 +9,6 @@ const char *BDF_LARGE_FONT_FILE = "fonts/9x18.bdf";
 using namespace rgb_matrix;
 using namespace displays;
 
-LedMatrixDisplay::LedMatrixDisplay() : _rgbMatrix(nullptr), _frameCanvas(nullptr), _color(255, 255, 255), _smallFont(nullptr), _largeFont(nullptr) {}
-
-LedMatrixDisplay::~LedMatrixDisplay() {
-    delete _rgbMatrix;
-    delete _smallFont;
-}
-
 bool LedMatrixDisplay::Initialize(int argc, char *argv[]) {
     RGBMatrix::Options options;
     options.hardware_mapping = "adafruit-hat-pwm";
@@ -25,7 +18,7 @@ bool LedMatrixDisplay::Initialize(int argc, char *argv[]) {
 
     RuntimeOptions runtimeOptions;
     runtimeOptions.gpio_slowdown = 2;
-    _rgbMatrix = rgb_matrix::CreateMatrixFromFlags(&argc, &argv, &options, &runtimeOptions);
+    _rgbMatrix = std::unique_ptr<rgb_matrix::RGBMatrix>(rgb_matrix::CreateMatrixFromFlags(&argc, &argv, &options, &runtimeOptions));
 
     if (_rgbMatrix == nullptr) {
         std::cerr << "Could not initialize matrix" << std::endl;
@@ -35,15 +28,15 @@ bool LedMatrixDisplay::Initialize(int argc, char *argv[]) {
 
     _frameCanvas = _rgbMatrix->CreateFrameCanvas();
 
-    _smallFont = new Font();
+    _smallFont = std::make_unique<Font>();
     if (!_smallFont->LoadFont(BDF_SMALL_FONT_FILE)) {
-        std::cerr <<  "Could not load font " << BDF_SMALL_FONT_FILE << std::endl;
+        std::cerr << "Could not load font " << BDF_SMALL_FONT_FILE << std::endl;
         return false;
     }
 
-    _largeFont = new Font();
+    _largeFont = std::make_unique<Font>();
     if (!_largeFont->LoadFont(BDF_LARGE_FONT_FILE)) {
-        std::cerr <<  "Could not load font " << BDF_LARGE_FONT_FILE << std::endl;
+        std::cerr << "Could not load font " << BDF_LARGE_FONT_FILE << std::endl;
         return false;
     }
 
@@ -77,37 +70,38 @@ void LedMatrixDisplay::DrawDigit(int position, int digit) {
     }
 
     // top
-    if (digit==0 || digit==2 || digit==3 || digit==5 || digit==6 || digit==7 || digit==8 || digit==9) {
+    if (digit == 0 || digit == 2 || digit == 3 || digit == 5 || digit == 6 || digit == 7 || digit == 8 || digit == 9) {
         DrawRectangle(startX, DIGIT_START_Y, 10, 2);
     }
 
     // middle
-    if (digit==2 || digit==3 || digit==4 || digit==5 || digit==6 || digit==8 || digit==9) {
+    if (digit == 2 || digit == 3 || digit == 4 || digit == 5 || digit == 6 || digit == 8 || digit == 9) {
         DrawRectangle(startX, DIGIT_START_Y + 8, 10, 2);
     }
 
     // bottom
-    if (digit==0 || digit==2 || digit==3 || digit==5 || digit==6 || digit==8 || digit==9) {
+    if (digit == 0 || digit == 2 || digit == 3 || digit == 5 || digit == 6 || digit == 8 || digit == 9) {
         DrawRectangle(startX, DIGIT_START_Y + 16, 10, 2);
     }
 
     // left top
-    if (digit==0 || digit==4 || digit==5 || digit==6 || digit==8 || digit==9) {
+    if (digit == 0 || digit == 4 || digit == 5 || digit == 6 || digit == 8 || digit == 9) {
         DrawRectangle(startX, DIGIT_START_Y, 2, 10);
     }
 
     // right top
-    if (digit==0 || digit==1 || digit==2 || digit==3 || digit==4 || digit==7 || digit==8 || digit==9) {
+    if (digit == 0 || digit == 1 || digit == 2 || digit == 3 || digit == 4 || digit == 7 || digit == 8 || digit == 9) {
         DrawRectangle(startX + 8, DIGIT_START_Y, 2, 10);
     }
 
     // left bottom
-    if (digit==0 || digit==2 || digit==6 || digit==8) {
+    if (digit == 0 || digit == 2 || digit == 6 || digit == 8) {
         DrawRectangle(startX, DIGIT_START_Y + 8, 2, 10);
     }
 
     // right bottom
-    if (digit==0 || digit==1 || digit==3 || digit==4 || digit==5 || digit==6 || digit==7 || digit==8 || digit==9) {
+    if (digit == 0 || digit == 1 || digit == 3 || digit == 4 || digit == 5 || digit == 6 || digit == 7 || digit == 8 ||
+        digit == 9) {
         DrawRectangle(startX + 8, DIGIT_START_Y + 8, 2, 10);
     }
 }
@@ -124,6 +118,6 @@ void LedMatrixDisplay::Show() {
     _frameCanvas = _rgbMatrix->SwapOnVSync(_frameCanvas);
 }
 
-Display* displays::createDisplay() {
-    return new LedMatrixDisplay();
+std::unique_ptr<Display>  displays::createDisplay() {
+    return std::make_unique<LedMatrixDisplay>();
 }

@@ -23,7 +23,7 @@ namespace displays {
         virtual void Show() =0;
     };
 
-    Display* createDisplay();
+    std::unique_ptr<Display> createDisplay();
 }
 
 #endif //DISPLAYSERVER_DISPLAY_H

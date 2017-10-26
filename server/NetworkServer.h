@@ -6,14 +6,14 @@
 
 class NetworkServer {
 public:
-    explicit NetworkServer(std::unique_ptr<displays::Display> &display) : _messages("") {
+    explicit NetworkServer(std::shared_ptr<displays::Display> &display) : _messages("") {
         _display = std::move(display);
     }
 
     void RunServer(int port);
 
 private:
-    std::unique_ptr<displays::Display> _display;
+    std::shared_ptr<displays::Display> _display;
     std::string _messages;
 
     void handleClientConnection(int serverSocket);

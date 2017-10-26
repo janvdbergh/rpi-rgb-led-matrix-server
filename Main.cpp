@@ -3,7 +3,7 @@
 #include "server/NetworkServer.h"
 
 int main(int argc, char* argv[]) {
-    std::unique_ptr<displays::Display> display(displays::createDisplay());
+    std::shared_ptr<displays::Display> display(displays::createDisplay());
     if (!display->Initialize(argc, argv)) {
         return 1;
     }

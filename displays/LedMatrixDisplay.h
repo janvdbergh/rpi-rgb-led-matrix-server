@@ -9,9 +9,7 @@ namespace displays {
 
     class LedMatrixDisplay : public Display {
     public:
-        LedMatrixDisplay();
-
-        ~LedMatrixDisplay() override;
+        LedMatrixDisplay() : _frameCanvas(nullptr), _color(255, 255, 255) {}
 
         bool Initialize(int argc, char **argv) override;
 
@@ -27,11 +25,12 @@ namespace displays {
         void Show() override;
 
     private:
-        rgb_matrix::RGBMatrix *_rgbMatrix;
+        std::unique_ptr<rgb_matrix::RGBMatrix> _rgbMatrix;
         rgb_matrix::FrameCanvas *_frameCanvas;
+
         rgb_matrix::Color _color;
-        rgb_matrix::Font *_smallFont;
-        rgb_matrix::Font *_largeFont;
+        std::unique_ptr<rgb_matrix::Font> _smallFont;
+        std::unique_ptr<rgb_matrix::Font> _largeFont;
     };
 }
 
