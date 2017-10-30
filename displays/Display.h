@@ -2,6 +2,7 @@
 #define DISPLAYSERVER_DISPLAY_H
 
 #include <string>
+#include <boost/shared_ptr.hpp>
 
 namespace displays {
 
@@ -23,7 +24,7 @@ namespace displays {
         virtual void Show() =0;
     };
 
-    std::unique_ptr<Display> createDisplay();
+    boost::shared_ptr<Display> createDisplay();
 }
 
 #endif //DISPLAYSERVER_DISPLAY_H

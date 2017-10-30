@@ -58,6 +58,6 @@ void MockDisplay::Show() {
     std::cout << "Show()" << std::endl << std::endl;
 }
 
-std::unique_ptr<Display> displays::createDisplay() {
-    return std::make_unique<MockDisplay>();
+boost::shared_ptr<Display> displays::createDisplay() {
+    return boost::shared_ptr<MockDisplay>(new MockDisplay());
 }

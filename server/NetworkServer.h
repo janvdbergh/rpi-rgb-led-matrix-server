@@ -1,19 +1,16 @@
 #ifndef DISPLAYSERVER_NETWORK_SERVER_H
 #define DISPLAYSERVER_NETWORK_SERVER_H
 
-#include <string>
 #include "../displays/Display.h"
 
 class NetworkServer {
 public:
-    explicit NetworkServer(std::shared_ptr<displays::Display> &display) : _messages("") {
-        _display = std::move(display);
-    }
+    explicit NetworkServer(boost::shared_ptr<displays::Display> &display) : _messages(""), _display(display) {}
 
     void RunServer(int port);
 
 private:
-    std::shared_ptr<displays::Display> _display;
+    boost::shared_ptr<displays::Display> _display;
     std::string _messages;
 
     void handleClientConnection(int serverSocket);

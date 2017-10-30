@@ -118,6 +118,6 @@ void LedMatrixDisplay::Show() {
     _frameCanvas = _rgbMatrix->SwapOnVSync(_frameCanvas);
 }
 
-std::unique_ptr<Display>  displays::createDisplay() {
-    return std::make_unique<LedMatrixDisplay>();
+boost::shared_ptr<Display> displays::createDisplay() {
+    return boost::shared_ptr<Display>(new LedMatrixDisplay());
 }

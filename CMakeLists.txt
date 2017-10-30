@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.8)
 project(DisplayServer)
 set(CMAKE_CXX_STANDARD 14)
 
+find_package(Boost 1.65 REQUIRED)
+include_directories(${Boost_INCLUDE_DIR})
+
 # Led matrix display
 set(RPI_RGB_LED_MATRIX_DIR $ENV{HOME}/libs/rpi-rgb-led-matrix)
 include_directories(${RPI_RGB_LED_MATRIX_DIR}/include)
@@ -13,7 +16,7 @@ add_executable(DisplayServerLed
         displays/Display.cpp
         displays/LedMatrixDisplay.cpp
         )
-target_link_libraries(DisplayServerLed rgbmatrix)
+target_link_libraries(DisplayServerLed rgbmatrix ${Boost_LIBRARIES})
 
 add_executable(DisplayServerMock
         Main.cpp
@@ -21,3 +24,4 @@ add_executable(DisplayServerMock
         displays/Display.cpp
         displays/MockDisplay.cpp
         )
+target_link_libraries(DisplayServerMock ${Boost_LIBRARIES})
