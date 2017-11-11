@@ -1,14 +1,15 @@
 #include "displays/Display.h"
-#include "server/NetworkServer.h"
+#include "network/Server.h"
 
 int main(int argc, char* argv[]) {
-    boost::shared_ptr<displays::Display> display(displays::createDisplay());
+    boost::shared_ptr<Display> display(createDisplay());
     if (!display->Initialize(argc, argv)) {
         return 1;
     }
 
-    NetworkServer networkServer(display);
-    networkServer.RunServer(1236);
+    Server networkServer(display, 1236);
+
+    networkServer.StartServerAndBlock();
 
     return 0;
 }

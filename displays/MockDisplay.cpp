@@ -6,8 +6,6 @@ const int DIGIT_START_Y = 12;
 const char *BDF_SMALL_FONT_FILE = "fonts/6x9.bdf";
 const char *BDF_LARGE_FONT_FILE = "fonts/9x18.bdf";
 
-using namespace displays;
-
 MockDisplay::MockDisplay() {
     std::cout << "MockDisplay()" << std::endl;
 }
@@ -34,23 +32,23 @@ void MockDisplay::Clear() {
     std::cout << "Clear()" << std::endl;
 }
 
-void MockDisplay::DrawPixel(int x, int y) {
+void MockDisplay::DrawPixel(int16_t x, int16_t y) {
     std::cout << "DrawPixel(" << x << ", " << y << ")" << std::endl;
 }
 
-void MockDisplay::DrawRectangle(int x, int y, int width, int height) {
+void MockDisplay::DrawRectangle(int16_t x, int16_t y, int16_t width, int16_t height) {
     std::cout << "DrawRectangle(" << x << ", " << y << ", " << width << ", " << height << ")" << std::endl;
 }
 
-void MockDisplay::DrawDigit(int position, int digit) {
+void MockDisplay::DrawDigit(uint8_t position, uint8_t digit) {
     std::cout << "DrawDigit(" << position << ", " << digit << ")" << std::endl;
 }
 
-void MockDisplay::DrawSmallText(int x, int y, std::string text) {
+void MockDisplay::DrawSmallText(int16_t x, int16_t y, std::string text) {
     std::cout << "DrawSmallText(" << x << ", " << y << ", \"" << text << "\")" << std::endl;
 }
 
-void MockDisplay::DrawLargeText(int x, int y, std::string text) {
+void MockDisplay::DrawLargeText(int16_t x, int16_t y, std::string text) {
     std::cout << "DrawLargeText(" << x << ", " << y << ", \"" << text << "\")" << std::endl;
 }
 
@@ -58,6 +56,6 @@ void MockDisplay::Show() {
     std::cout << "Show()" << std::endl << std::endl;
 }
 
-boost::shared_ptr<Display> displays::createDisplay() {
+boost::shared_ptr<Display> createDisplay() {
     return boost::shared_ptr<MockDisplay>(new MockDisplay());
 }
