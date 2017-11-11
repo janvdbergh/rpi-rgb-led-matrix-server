@@ -25,7 +25,7 @@ bool MockDisplay::Initialize(int argc, char *argv[]) {
 }
 
 void MockDisplay::SetColor(uint8_t r, uint8_t g, uint8_t b) {
-    std::cout << "SetColor(" << r << ", " << g << ", " << b << ")" << std::endl;
+    std::cout << "SetColor(" << (int) r << ", " << (int) g << ", " << (int) b << ")" << std::endl;
 }
 
 void MockDisplay::Clear() {

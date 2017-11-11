@@ -3,14 +3,21 @@
 #include <boost/asio.hpp>
 #include <boost/endian/arithmetic.hpp>
 
+#include "../network/Packet.h"
+
 using boost::asio::ip::tcp;
 
 int main(int argc, char *argv[]) {
-    std::cout << sizeof(unsigned long) << std::endl;
+    Packet packet = PacketWriter()
+            .AddCommand(COLOR)
+            .AddByte(255)
+            .AddByte(255)
+            .AddByte(255)
+            .CreatePacket();
 
-    boost::endian::little_uint16_at data = 1;
-    uint32_t length = sizeof(data);
-    
+    std::vector<char> data = packet.GetData();
+    uint32_t length = packet.GetSize();
+
     boost::crc_32_type crc32;
     crc32.process_bytes(data.data(), length);
     unsigned long crc = crc32.checksum();
@@ -26,7 +33,7 @@ int main(int argc, char *argv[]) {
     std::vector<boost::asio::mutable_buffer> bufs;
     boost::system::error_code error;
     bufs.push_back(boost::asio::buffer(&length, sizeof(length)));
-    bufs.push_back(boost::asio::buffer(&data, length));
+    bufs.push_back(boost::asio::buffer(data.data(), length));
     bufs.push_back(boost::asio::buffer(&crc, sizeof(crc)));
 
     boost::asio::write(socket, bufs, error);

@@ -3,10 +3,6 @@
 #include "Errors.h"
 #include "Packet.h"
 
-uint32_t Packet::GetSize() const {
-    return static_cast<uint32_t>(_data.size());
-}
-
 template<typename T>
 void PacketReader::Read(T &result_holder) {
     Read(&result_holder, sizeof(T));
@@ -59,4 +55,34 @@ std::string PacketReader::NextString() {
     return std::string(chars);
 }
 
+template<typename T>
+void PacketWriter::Write(T &value) {
+    size_t position = _data.size();
+    _data.resize(position + sizeof(value));
+    memcpy(&_data.front() + position, &value, sizeof(value));
+}
 
+PacketWriter &PacketWriter::AddCommand(Command command) {
+    auto value = (uint16_t) command;
+    Write(value);
+    return *this;
+}
+
+PacketWriter &PacketWriter::AddByte(uint8_t value) {
+    Write(value);
+    return *this;
+}
+
+PacketWriter &PacketWriter::AddShort(int16_t value) {
+    Write(value);
+    return *this;
+}
+
+PacketWriter &PacketWriter::AddString(std::string value) {
+    Write(value);
+    return *this;
+}
+
+Packet PacketWriter::CreatePacket() {
+    return Packet(_data);
+}

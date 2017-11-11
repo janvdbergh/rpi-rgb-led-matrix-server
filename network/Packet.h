@@ -21,7 +21,9 @@ class Packet {
 public:
     explicit Packet(std::vector<char> data) { _data = std::move(data); }
 
-    uint32_t GetSize() const;
+    uint32_t GetSize() const { return static_cast<uint32_t>(_data.size()); }
+
+    const std::vector<char>& GetData() const { return _data; }
 
 private:
     std::vector<char> _data;
@@ -52,9 +54,28 @@ private:
 
     void Read(void *result_holder, size_t size);
 
-
-
     uint16_t NextUnsignedShort();
+};
+
+class PacketWriter {
+public:
+    PacketWriter() = default;
+
+    PacketWriter &AddCommand(Command command);
+
+    PacketWriter &AddByte(uint8_t value);
+
+    PacketWriter &AddShort(int16_t value);
+
+    PacketWriter &AddString(std::string value);
+
+    Packet CreatePacket();
+
+private:
+    std::vector<char> _data;
+
+    template<typename T>
+    void Write(T &value);
 };
 
 #endif //DISPLAYSERVER_PACKET_H
