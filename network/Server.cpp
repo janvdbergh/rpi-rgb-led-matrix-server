@@ -94,36 +94,53 @@ Packet Server::ReadData(tcp::socket &socket, uint32_t data_length) {
 void Server::HandlePacket(Packet packet) {
     PacketReader packetReader(packet);
 
-    boost::endian::little_uint16_at command = packetReader.NextCommand();
+    Command command;
+    uint8_t r, g, b, position, digit;
+    int16_t x, y, width, height;
+    std::string string;
+
+    packetReader >> command;
 
     switch (command) {
         case CLEAR:
             _display->Clear();
             break;
+
         case SHOW:
             _display->Show();
             break;
+
         case COLOR:
-            _display->SetColor(packetReader.NextByte(), packetReader.NextByte(), packetReader.NextByte());
+            packetReader >> r >> g >> b >> complete;
+            _display->SetColor(r, g, b);
             break;
+
         case PIXEL:
-            _display->DrawPixel(packetReader.NextShort(), packetReader.NextShort());
+            packetReader >> x >> y >> complete;
+            _display->DrawPixel(x, y);
             break;
+
         case RECTANGLE:
-            _display->DrawRectangle(packetReader.NextShort(),packetReader.NextShort(),packetReader.NextShort(),packetReader.NextShort());
+            packetReader >> x >> y >> width >> height >> complete;
+            _display->DrawRectangle(x, y, width, height);
             break;
+
         case DIGIT:
-            _display->DrawDigit(packetReader.NextByte(), packetReader.NextByte());
+            packetReader >> position >> digit >> complete;
+            _display->DrawDigit(position, digit);
             break;
+
         case SMALL_TEXT:
-            _display->DrawSmallText(packetReader.NextShort(), packetReader.NextShort(), packetReader.NextString());
+            packetReader >> x >> y >> string >> complete;
+            _display->DrawSmallText(x, y, string);
             break;
+
         case LARGE_TEXT:
-            _display->DrawLargeText(packetReader.NextShort(), packetReader.NextShort(), packetReader.NextString());
+            packetReader >> x >> y >> string >> complete;
+            _display->DrawLargeText(x, y, string);
             break;
+
         default:
             boost::throw_exception(UnknownCommandError(command));
     }
-
-    packetReader.ValidateCompletelyRead();
 }

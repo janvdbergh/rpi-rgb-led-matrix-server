@@ -1,5 +1,6 @@
 #include <boost/endian/arithmetic.hpp>
 #include <boost/asio.hpp>
+#include <iostream>
 #include "Errors.h"
 #include "Packet.h"
 
@@ -18,41 +19,53 @@ void PacketReader::Read(void *result_holder, size_t size) {
     _position += size;
 }
 
-void PacketReader::ValidateCompletelyRead() {
+PacketReader &PacketReader::operator>>(Command &command) {
+    boost::endian::little_uint16_at result;
+    Read(result);
+    command = (Command) (int) result;
+
+    return *this;
+}
+
+PacketReader &PacketReader::operator>>(uint8_t &uint8) {
+    Read(uint8);
+    return *this;
+}
+
+PacketReader &PacketReader::operator>>(int16_t &int16) {
+    boost::endian::little_int16_at result;
+    Read(result);
+    int16 = result;
+    return *this;
+}
+
+PacketReader &PacketReader::operator>>(uint16_t &uint16) {
+    boost::endian::little_uint16_at result;
+    Read(result);
+    uint16 = result;
+    return *this;
+}
+
+PacketReader & PacketReader::operator>>(const PacketReaderComplete &_) {
     if (_packet.GetSize() != _position) {
         boost::throw_exception(InvalidSizeError(_position, _packet.GetSize()));
     }
+
+    return *this;
 }
 
-Command PacketReader::NextCommand() {
-    return (Command) NextUnsignedShort();
-}
+PacketReader &PacketReader::operator>>(std::string &string) {
+    uint16_t length;
+    this->operator>>(length);
 
-uint8_t PacketReader::NextByte() {
-    boost::endian::little_uint8_at result;
-    Read(result);
-    return result;
-}
-
-int16_t PacketReader::NextShort() {
-    boost::endian::little_int16_at result;
-    Read(result);
-    return result;
-}
-
-uint16_t PacketReader::NextUnsignedShort() {
-    boost::endian::little_uint16_at result;
-    Read(result);
-    return result;
-}
-
-std::string PacketReader::NextString() {
-    uint16_t length = NextUnsignedShort();
     char chars[length + 1];
     Read(chars, length);
     chars[length] = '\0';
+    string = chars;
 
-    return std::string(chars);
+    std::cout << std::endl;
+
+    return *this;
 }
 
 template<typename T>
@@ -62,27 +75,27 @@ void PacketWriter::Write(T &value) {
     memcpy(&_data.front() + position, &value, sizeof(value));
 }
 
-PacketWriter &PacketWriter::AddCommand(Command command) {
+PacketWriter &PacketWriter::operator<<(Command command) {
     auto value = (uint16_t) command;
     Write(value);
     return *this;
 }
 
-PacketWriter &PacketWriter::AddByte(uint8_t value) {
+PacketWriter &PacketWriter::operator<<(uint8_t value) {
     Write(value);
     return *this;
 }
 
-PacketWriter &PacketWriter::AddShort(int16_t value) {
+PacketWriter &PacketWriter::operator<<(int16_t value) {
     Write(value);
     return *this;
 }
 
-PacketWriter &PacketWriter::AddString(std::string value) {
+PacketWriter &PacketWriter::operator<<(std::string value) {
     Write(value);
     return *this;
 }
 
-Packet PacketWriter::CreatePacket() {
+PacketWriter::operator Packet() const {
     return Packet(_data);
 }

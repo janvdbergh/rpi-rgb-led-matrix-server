@@ -8,12 +8,7 @@
 using boost::asio::ip::tcp;
 
 int main(int argc, char *argv[]) {
-    Packet packet = PacketWriter()
-            .AddCommand(COLOR)
-            .AddByte(255)
-            .AddByte(255)
-            .AddByte(255)
-            .CreatePacket();
+    Packet packet(PacketWriter() << COLOR << (uint8_t) 255 << (uint8_t) 255 << (uint8_t) 255);
 
     std::vector<char> data = packet.GetData();
     uint32_t length = packet.GetSize();

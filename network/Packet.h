@@ -23,7 +23,7 @@ public:
 
     uint32_t GetSize() const { return static_cast<uint32_t>(_data.size()); }
 
-    const std::vector<char>& GetData() const { return _data; }
+    const std::vector<char> &GetData() const { return _data; }
 
 private:
     std::vector<char> _data;
@@ -31,19 +31,27 @@ private:
     friend class PacketReader;
 };
 
+class PacketReaderComplete {
+public:
+    PacketReaderComplete() =default;
+};
+const PacketReaderComplete complete;
+
 class PacketReader {
 public:
     explicit PacketReader(const Packet &packet) : _packet(packet), _position(0) {}
 
-    Command NextCommand();
+    PacketReader &operator>>(Command &command);
 
-    uint8_t NextByte();
+    PacketReader &operator>>(uint8_t &uint8);
 
-    int16_t NextShort();
+    PacketReader &operator>>(int16_t &int16);
 
-    std::string NextString();
+    PacketReader &operator>>(uint16_t &int16);
 
-    void ValidateCompletelyRead();
+    PacketReader &operator>>(std::string &string);
+
+    PacketReader & operator>>(const PacketReaderComplete &complete);
 
 private:
     const Packet &_packet;
@@ -53,23 +61,21 @@ private:
     void Read(T &resultHolder);
 
     void Read(void *result_holder, size_t size);
-
-    uint16_t NextUnsignedShort();
 };
 
 class PacketWriter {
 public:
     PacketWriter() = default;
 
-    PacketWriter &AddCommand(Command command);
+    PacketWriter &operator<<(Command command);
 
-    PacketWriter &AddByte(uint8_t value);
+    PacketWriter &operator<<(uint8_t value);
 
-    PacketWriter &AddShort(int16_t value);
+    PacketWriter &operator<<(int16_t value);
 
-    PacketWriter &AddString(std::string value);
+    PacketWriter &operator<<(std::string value);
 
-    Packet CreatePacket();
+    operator Packet() const;
 
 private:
     std::vector<char> _data;
