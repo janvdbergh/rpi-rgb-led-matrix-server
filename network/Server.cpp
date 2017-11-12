@@ -35,12 +35,13 @@ void Server::HandleClientConnection(tcp::socket &socket) {
     std::cout << "Connection open to " << socket.remote_endpoint() << std::endl;
 
     try {
-        uint32_t size = ReadDataLength(socket);
-        Packet packet = ReadData(socket, size);
-        std::cout << "Read " << packet.GetSize() << " bytes" << std::endl;
+        while(socket.is_open()) {
+            uint32_t size = ReadDataLength(socket);
+            Packet packet = ReadData(socket, size);
 
-        HandlePacket(packet);
-    } catch (ServerError &e) {
+            HandlePacket(packet);
+        }
+    } catch (NetworkError &e) {
         std::cerr << "Error: " << e.what() << std::endl;
     }
 
@@ -80,11 +81,8 @@ Packet Server::ReadData(tcp::socket &socket, uint32_t data_length) {
         boost::throw_exception(ReadError());
     }
 
-    boost::crc_32_type crc;
-    crc.process_bytes(data.data(), data_length);
-    unsigned long actualCrc = crc.checksum();
-
-    if (actualCrc != expectedCrc) {
+    Packet packet(data);
+    if (packet.GetCRC() != expectedCrc) {
         boost::throw_exception(CrcError());
     }
 

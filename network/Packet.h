@@ -25,6 +25,8 @@ public:
 
     const std::vector<char> &GetData() const { return _data; }
 
+    uint32_t GetCRC() const;
+
 private:
     std::vector<char> _data;
 
@@ -73,7 +75,7 @@ public:
 
     PacketWriter &operator<<(int16_t value);
 
-    PacketWriter &operator<<(std::string value);
+    PacketWriter &operator<<(const std::string &value);
 
     operator Packet() const;
 

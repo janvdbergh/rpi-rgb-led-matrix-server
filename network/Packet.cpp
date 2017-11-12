@@ -1,8 +1,15 @@
 #include <boost/endian/arithmetic.hpp>
 #include <boost/asio.hpp>
 #include <iostream>
+#include <boost/crc.hpp>
 #include "Errors.h"
 #include "Packet.h"
+
+uint32_t Packet::GetCRC() const {
+    boost::crc_32_type result;
+    result.process_bytes(_data.data(), _data.size());
+    return static_cast<uint32_t>(result.checksum());
+}
 
 template<typename T>
 void PacketReader::Read(T &result_holder) {
@@ -91,7 +98,7 @@ PacketWriter &PacketWriter::operator<<(int16_t value) {
     return *this;
 }
 
-PacketWriter &PacketWriter::operator<<(std::string value) {
+PacketWriter &PacketWriter::operator<<(const std::string &value) {
     Write(value);
     return *this;
 }

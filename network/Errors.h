@@ -4,9 +4,9 @@
 #include <boost/endian/arithmetic.hpp>
 #include <string>
 
-class ServerError : public std::exception {
+class NetworkError : public std::exception {
 public:
-    explicit ServerError(std::string message) : _message(std::move(message)) {}
+    explicit NetworkError(std::string message) : _message(std::move(message)) {}
 
     const char *what() { return _message.c_str(); }
 
@@ -14,34 +14,41 @@ private:
     const std::string _message;
 };
 
-class ReadError : public ServerError {
+class ReadError : public NetworkError {
 public:
-    ReadError() : ServerError("Read error") {}
+    ReadError() : NetworkError("Read error") {}
 
 public:
 };
 
-class CrcError : public ServerError {
+class WriteError : public NetworkError {
 public:
-    CrcError() : ServerError("CRC error") {}
+    WriteError() : NetworkError("Read error") {}
+
+public:
 };
 
-class UnknownCommandError : public ServerError {
+class CrcError : public NetworkError {
+public:
+    CrcError() : NetworkError("CRC error") {}
+};
+
+class UnknownCommandError : public NetworkError {
 public:
     explicit UnknownCommandError(boost::endian::little_uint16_at command);
 };
 
-class PacketTooLargeError : public ServerError {
+class PacketTooLargeError : public NetworkError {
 public:
-    PacketTooLargeError() : ServerError("Packet too large") {}
+    PacketTooLargeError() : NetworkError("Packet too large") {}
 };
 
-class IndexOutOfRangeError : public ServerError {
+class IndexOutOfRangeError : public NetworkError {
 public:
-    IndexOutOfRangeError() : ServerError("Index out of range") {}
+    IndexOutOfRangeError() : NetworkError("Index out of range") {}
 };
 
-class InvalidSizeError : public ServerError {
+class InvalidSizeError : public NetworkError {
 public:
     InvalidSizeError(size_t expectedSize, size_t actualSize);
 };

@@ -13,8 +13,8 @@ std::string GetInvalidSizeMessage(size_t expectedSize, size_t actualSize) {
     return stringStream.str();
 }
 
-UnknownCommandError::UnknownCommandError(boost::endian::little_uint16_at command) : ServerError(
+UnknownCommandError::UnknownCommandError(boost::endian::little_uint16_at command) : NetworkError(
         GetUnknownCommandMessage(command)) {}
 
-InvalidSizeError::InvalidSizeError(size_t expectedSize, size_t actualSize): ServerError(
+InvalidSizeError::InvalidSizeError(size_t expectedSize, size_t actualSize): NetworkError(
         GetInvalidSizeMessage(expectedSize, actualSize)) {}

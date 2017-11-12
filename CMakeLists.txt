@@ -37,5 +37,5 @@ add_executable(DisplayServerMock
         )
 target_link_libraries(DisplayServerMock ${Boost_LIBRARIES})
 
-add_executable(Test test/Test.cpp ${NETWORK_FILES})
+add_executable(Test test/Test.cpp ${NETWORK_FILES} network/Client.cpp network/Client.h)
 target_link_libraries(Test ${Boost_LIBRARIES})

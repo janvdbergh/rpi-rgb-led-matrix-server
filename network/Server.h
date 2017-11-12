@@ -8,13 +8,13 @@
 
 class Server {
 public:
-    Server(boost::shared_ptr<Display> &display, unsigned short port) : _display(display), _port(port) {}
+    Server(boost::shared_ptr<Display> &display, uint16_t port) : _display(display), _port(port) {}
 
     void StartServerAndBlock();
 
 private:
     boost::shared_ptr<Display> _display;
-    unsigned short _port;
+    uint16_t _port;
 
     void HandleClientConnection(boost::asio::ip::tcp::socket &socket);
 
