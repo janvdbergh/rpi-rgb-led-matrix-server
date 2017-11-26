@@ -2,8 +2,8 @@
 #include <boost/asio.hpp>
 #include <iostream>
 #include <boost/crc.hpp>
-#include "Errors.h"
-#include "Packet.h"
+#include "NetworkError.h"
+#include "NetworkPacket.h"
 
 uint32_t Packet::GetCRC() const {
     boost::crc_32_type result;

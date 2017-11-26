@@ -6,8 +6,8 @@
 #include <boost/endian/arithmetic.hpp>
 #include <boost/crc.hpp>
 
-#include "Errors.h"
-#include "Server.h"
+#include "NetworkError.h"
+#include "NetworkServer.h"
 
 using boost::asio::ip::tcp;
 

@@ -4,7 +4,7 @@
 #include <boost/asio.hpp>
 
 #include <string>
-#include "Packet.h"
+#include "NetworkPacket.h"
 
 class Client {
 public:

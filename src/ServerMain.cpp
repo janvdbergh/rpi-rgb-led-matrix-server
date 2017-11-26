@@ -1,5 +1,5 @@
-#include "displays/Display.h"
-#include "network/Server.h"
+#include "./Display.h"
+#include "./NetworkServer.h"
 
 int main(int argc, char* argv[]) {
     boost::shared_ptr<Display> display(createDisplay());

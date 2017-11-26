@@ -2,8 +2,8 @@
 // Created by Jan Van den Bergh on 12/11/2017.
 //
 
-#include "Client.h"
-#include "Errors.h"
+#include "NetworkClient.h"
+#include "NetworkError.h"
 
 using boost::asio::ip::tcp;
 

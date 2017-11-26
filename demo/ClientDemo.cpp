@@ -1,4 +1,4 @@
-#include "../network/Client.h"
+#include "../src/NetworkClient.h"
 
 using boost::asio::ip::tcp;
 
@@ -12,7 +12,7 @@ int main(int argc, char *argv[]) {
             .DrawPixel(12, 12)
             .Show();
 
-    sleep(20000);
+    sleep(8);
 
     return 0;
 }

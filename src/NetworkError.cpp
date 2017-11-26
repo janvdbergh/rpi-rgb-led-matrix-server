@@ -1,5 +1,5 @@
 #include <sstream>
-#include "Errors.h"
+#include "NetworkError.h"
 
 std::string GetUnknownCommandMessage(boost::endian::little_uint16_at command) {
     std::ostringstream stringStream;

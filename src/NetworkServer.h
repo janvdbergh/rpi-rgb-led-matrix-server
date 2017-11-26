@@ -3,8 +3,8 @@
 
 #include <boost/asio.hpp>
 #include <utility>
-#include "../displays/Display.h"
-#include "Packet.h"
+#include "Display.h"
+#include "NetworkPacket.h"
 
 class Server {
 public:
