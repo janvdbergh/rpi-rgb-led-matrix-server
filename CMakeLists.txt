@@ -11,13 +11,6 @@ set(RPI_RGB_LED_MATRIX_DIR $ENV{HOME}/libs/rpi-rgb-led-matrix)
 include_directories(${RPI_RGB_LED_MATRIX_DIR}/include)
 link_directories(${RPI_RGB_LED_MATRIX_DIR}/lib)
 
-# Network files
-set(NETWORK_FILES
-        src/NetworkError.cpp
-        src/NetworkPacket.cpp
-        src/NetworkServer.cpp
-        )
-
 # Led matrix display
 add_executable(DisplayServerLed
         src/ServerMain.cpp
@@ -41,11 +34,19 @@ add_executable(DisplayServerMock
         )
 target_link_libraries(DisplayServerMock ${Boost_LIBRARIES})
 
-add_executable(demo
+# Client library
+add_library(NetworkClient SHARED
+        src/NetworkPacket.cpp
+        src/NetworkError.cpp
+        src/NetworkClient.cpp
+        )
+target_link_libraries(NetworkClient ${Boost_LIBRARIES})
+
+# Demo
+add_executable(Demo
         demo/ClientDemo.cpp
         src/NetworkPacket.cpp
         src/NetworkError.cpp
         src/NetworkClient.cpp
-        src/NetworkClient.h
         )
-target_link_libraries(demo ${Boost_LIBRARIES})
+target_link_libraries(Demo ${Boost_LIBRARIES} NetworkClient)
