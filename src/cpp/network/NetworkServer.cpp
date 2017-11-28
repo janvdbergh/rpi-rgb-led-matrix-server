@@ -71,7 +71,7 @@ Packet Server::ReadData(tcp::socket &socket, uint32_t data_length) {
     std::vector<boost::asio::mutable_buffer> bufs;
     boost::system::error_code error;
     std::vector<char> data(data_length);
-    unsigned long expectedCrc;
+    uint32_t expectedCrc;
 
     bufs.clear();
     bufs.push_back(boost::asio::buffer(&data.front(), data_length));

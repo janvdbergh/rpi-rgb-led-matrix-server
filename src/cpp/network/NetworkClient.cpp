@@ -64,7 +64,7 @@ void Client::WritePacket(const Packet &packet) {
 
     uint32_t size = packet.GetSize();
     std::vector<char> data = packet.GetData();
-    unsigned long crc = packet.GetCRC();
+    uint32_t crc = packet.GetCRC();
     
     bufs.push_back(boost::asio::buffer(&size, sizeof(size)));
     bufs.push_back(boost::asio::buffer(data.data(), size));
