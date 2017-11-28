@@ -1,4 +1,4 @@
-#include "../src/NetworkClient.h"
+#include "../network/NetworkClient.h"
 
 using boost::asio::ip::tcp;
 

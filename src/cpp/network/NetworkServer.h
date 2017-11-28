@@ -3,7 +3,7 @@
 
 #include <boost/asio.hpp>
 #include <utility>
-#include "Display.h"
+#include "../display/Display.h"
 #include "NetworkPacket.h"
 
 class Server {
