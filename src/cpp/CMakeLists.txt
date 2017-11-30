@@ -1,7 +1,3 @@
-cmake_minimum_required(VERSION 3.7)
-project(DisplayServer)
-set(CMAKE_CXX_STANDARD 14)
-
 # Boost libraries
 find_package(Boost 1.65 REQUIRED COMPONENTS system)
 include_directories(${Boost_INCLUDE_DIR})
