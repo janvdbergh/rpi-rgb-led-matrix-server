@@ -17,7 +17,7 @@ add_executable(DisplayServerLed
         display/LedMatrixDisplay.cpp
         network/NetworkError.h
         )
-target_link_libraries(DisplayServerLed rgbmatrix ${Boost_LIBRARIES})
+target_link_libraries(DisplayServerLed rgbmatrix ${Boost_LIBRARIES} pthread)
 
 # Mock display
 add_executable(DisplayServerMock
@@ -28,7 +28,7 @@ add_executable(DisplayServerMock
         display/Display.cpp
         display/MockDisplay.cpp
         )
-target_link_libraries(DisplayServerMock ${Boost_LIBRARIES})
+target_link_libraries(DisplayServerMock ${Boost_LIBRARIES} pthread)
 
 # Client library
 add_library(NetworkClient SHARED
@@ -41,8 +41,5 @@ target_link_libraries(NetworkClient ${Boost_LIBRARIES})
 # Demo
 add_executable(Demo
         demo/ClientDemo.cpp
-        network/NetworkPacket.cpp
-        network/NetworkError.cpp
-        network/NetworkClient.cpp
         )
-target_link_libraries(Demo ${Boost_LIBRARIES} NetworkClient)
+target_link_libraries(Demo ${Boost_LIBRARIES} pthread NetworkClient)
