@@ -35,3 +35,9 @@
 cmake-build-debug
 .idea
 CMakeCache.txt
+
+# Alternative build files
+build
+
+# Python files
+__pycache__

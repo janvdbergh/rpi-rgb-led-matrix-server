@@ -41,7 +41,7 @@ void MockDisplay::DrawRectangle(int16_t x, int16_t y, int16_t width, int16_t hei
 }
 
 void MockDisplay::DrawDigit(uint8_t position, uint8_t digit) {
-    std::cout << "DrawDigit(" << position << ", " << digit << ")" << std::endl;
+    std::cout << "DrawDigit(" << (int) position << ", " << (int) digit << ")" << std::endl;
 }
 
 void MockDisplay::DrawSmallText(int16_t x, int16_t y, std::string text) {
