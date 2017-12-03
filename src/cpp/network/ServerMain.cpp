@@ -2,7 +2,7 @@
 #include "NetworkServer.h"
 
 int main(int argc, char* argv[]) {
-    boost::shared_ptr<Display> display(createDisplay());
+    boost::shared_ptr<Display> display(CreateDisplay());
     if (!display->Initialize(argc, argv)) {
         return 1;
     }

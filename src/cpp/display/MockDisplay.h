@@ -27,6 +27,8 @@ public:
 
     void DrawLargeText(int16_t x, int16_t y, std::string text) override;
 
+    virtual void DrawImage(int16_t x, int16_t y, const std::string &imageName) override;
+
     void Show() override;
 };
 

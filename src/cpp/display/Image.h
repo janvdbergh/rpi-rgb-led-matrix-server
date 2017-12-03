@@ -2,26 +2,28 @@
 #define DISPLAYSERVER_IMAGE_H
 
 #include <vector>
+#include <boost/shared_ptr.hpp>
 
 class Image {
 public:
-    uint8_t red(uint16_t x, uint16_t y) const { return _red[index(x, y)]; }
+    uint16_t GetHeight() const { return _height; }
+    uint16_t GetWidth() const { return _width; }
 
-    uint8_t green(uint16_t x, uint16_t y) const { return _green[index(x, y)]; }
+    uint8_t GetRed(uint16_t x, uint16_t y) const { return _red[Index(x, y)]; }
 
-    uint8_t blue(uint16_t x, uint16_t y) const { return _blue[index(x, y)]; }
+    uint8_t GetGreen(uint16_t x, uint16_t y) const { return _green[Index(x, y)]; }
 
-    uint8_t alpha(uint16_t x, uint16_t y) const { return _alpha[index(x, y)]; }
+    uint8_t GetBlue(uint16_t x, uint16_t y) const { return _blue[Index(x, y)]; }
 
 private:
     uint16_t _width, _height;
-    std::vector<uint8_t> _red, _green, _blue, _alpha;
+    std::vector<uint8_t> _red, _green, _blue;
 
     Image(uint16_t width, uint16_t height);
 
-    void setPixel(uint16_t x, uint16_t y, uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha);
+    void SetPixel(uint16_t x, uint16_t y, uint8_t red, uint8_t green, uint8_t blue);
 
-    size_t index(uint16_t x, uint16_t y) const {
+    size_t Index(uint16_t x, uint16_t y) const {
         return y * _width + x;
     }
 
@@ -30,18 +32,18 @@ private:
 
 class ImageBuilder {
 public:
-    ImageBuilder(uint16_t width, uint16_t height) : _image(width, height) {}
+    ImageBuilder(uint16_t width, uint16_t height) : _image(new Image(width, height)) {}
 
-    void setPixel(uint16_t x, uint16_t y, uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha) {
-        _image.setPixel(x, y, red, green, blue, alpha);
+    void SetPixel(uint16_t x, uint16_t y, uint8_t red, uint8_t green, uint8_t blue) {
+        _image->SetPixel(x, y, red, green, blue);
     }
 
-    Image build() const {
+    boost::shared_ptr<const Image> Build() const {
         return _image;
     }
 
 private:
-    Image _image;
+    boost::shared_ptr<Image> _image;
 };
 
 
