@@ -103,7 +103,7 @@ class NetworkClient:
         self.sendPacket(packet)
 
 
-    def drawImage(self, x, y, name):
+    def image(self, x, y, name):
         self.sendPacket(
             to16BitUnsigned(Command.DRAW_IMAGE.value) + to16BitUnsigned(x) + to16BitUnsigned(y) + toString(name)
         )
