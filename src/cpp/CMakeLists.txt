@@ -13,10 +13,11 @@ add_executable(DisplayServerLed
         network/NetworkError.cpp
         network/NetworkPacket.cpp
         network/NetworkServer.cpp
+        display/Image.cpp
         display/Display.cpp
         display/LedMatrixDisplay.cpp
         network/NetworkError.h
-        )
+        display/Image.cpp display/Image.h)
 target_link_libraries(DisplayServerLed rgbmatrix ${Boost_LIBRARIES} pthread)
 
 # Mock display
@@ -25,6 +26,7 @@ add_executable(DisplayServerMock
         network/NetworkError.cpp
         network/NetworkPacket.cpp
         network/NetworkServer.cpp
+        display/Image.cpp
         display/Display.cpp
         display/MockDisplay.cpp
         )
