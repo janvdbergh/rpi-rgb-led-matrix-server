@@ -17,3 +17,7 @@ void Image::SetPixel(uint16_t x, uint16_t y, uint8_t red, uint8_t green, uint8_t
     _green[index] = green;
     _blue[index] = blue;
 }
+
+void ImageBuilder::SetPixel(uint16_t x, uint16_t y, uint8_t red, uint8_t green, uint8_t blue) {
+    _image->SetPixel(x, y, red, green, blue);
+}

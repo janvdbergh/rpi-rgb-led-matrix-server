@@ -26,7 +26,7 @@ public:
 
     virtual void DrawLargeText(int16_t x, int16_t y, std::string text) =0;
 
-    void DefineImage(std::string name, boost::shared_ptr<Image> image);
+    void DefineImage(const std::string &name, boost::shared_ptr<const Image> image);
 
     virtual void DrawImage(int16_t x, int16_t y, const std::string &imageName) =0;
 
@@ -38,7 +38,7 @@ protected:
     }
 
 private:
-    std::map<std::string, boost::shared_ptr<Image>> _images;
+    std::map<std::string, boost::shared_ptr<const Image>> _images;
 };
 
 boost::shared_ptr<Display> CreateDisplay();

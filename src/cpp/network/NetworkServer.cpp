@@ -35,7 +35,7 @@ void Server::HandleClientConnection(tcp::socket &socket) {
     std::cout << "Connection open to " << socket.remote_endpoint() << std::endl;
 
     try {
-        while(socket.is_open()) {
+        while (socket.is_open()) {
             uint32_t size = ReadDataLength(socket);
             Packet packet = ReadData(socket, size);
 
@@ -96,6 +96,7 @@ void Server::HandlePacket(Packet packet) {
     uint8_t r, g, b, position, digit;
     int16_t x, y, width, height;
     std::string string;
+    boost::shared_ptr<const Image> image;
 
     packetReader >> command;
 
@@ -136,6 +137,16 @@ void Server::HandlePacket(Packet packet) {
         case LARGE_TEXT:
             packetReader >> x >> y >> string >> complete;
             _display->DrawLargeText(x, y, string);
+            break;
+
+        case DEFINE_IMAGE:
+            packetReader >> string >> image >> complete;
+            _display->DefineImage(string, image);
+            break;
+
+        case DRAW_IMAGE:
+            packetReader >> x >> y >> string >> complete;
+            _display->DrawImage(x, y, string);
             break;
 
         default:

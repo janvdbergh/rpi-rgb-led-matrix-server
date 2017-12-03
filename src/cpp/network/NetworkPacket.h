@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include "../display/Image.h"
 
 const uint32_t MAX_PACKET_SIZE = 8192;
 
@@ -14,7 +15,9 @@ enum Command {
     RECTANGLE,
     DIGIT,
     SMALL_TEXT,
-    LARGE_TEXT
+    LARGE_TEXT,
+    DEFINE_IMAGE,
+    DRAW_IMAGE
 };
 
 class Packet {
@@ -53,6 +56,8 @@ public:
 
     PacketReader &operator>>(std::string &string);
 
+    PacketReader& operator>>(boost::shared_ptr<const Image> &image);
+
     PacketReader & operator>>(const PacketReaderComplete &complete);
 
 private:
@@ -75,7 +80,11 @@ public:
 
     PacketWriter &operator<<(int16_t value);
 
+    PacketWriter &operator<<(uint16_t value);
+
     PacketWriter &operator<<(const std::string &value);
+
+    PacketWriter& operator<<(boost::shared_ptr<const Image> image);
 
     operator Packet() const;
 
@@ -84,6 +93,8 @@ private:
 
     template<typename T>
     void Write(T &value);
+
+    void Write(const void *data, size_t size);
 };
 
 #endif //DISPLAYSERVER_PACKET_H
