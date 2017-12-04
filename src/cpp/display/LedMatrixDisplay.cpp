@@ -118,8 +118,8 @@ void LedMatrixDisplay::DrawImage(int16_t x, int16_t y, const std::string &imageN
     boost::shared_ptr<const Image> image = GetImage(imageName);
 
     if (image) {
-        for (uint16_t i = 0; i < image->GetHeight(); i++) {
-            for (uint16_t j = 0; j < image->GetWidth(); j++) {
+        for (uint16_t i = 0; i < image->GetWidth(); i++) {
+            for (uint16_t j = 0; j < image->GetHeight(); j++) {
                 _frameCanvas->SetPixel(x + i, y + j, image->GetRed(i, j), image->GetGreen(i, j), image->GetBlue(i, j));
             }
         }
