@@ -15,6 +15,8 @@ class Command(Enum):
     DIGIT = 5
     SMALL_TEXT = 6
     LARGE_TEXT = 7
+    DEFINE_IMAGE = 8
+    DRAW_IMAGE = 9
 
 
 def to8BitUnsigned(value):
@@ -31,6 +33,9 @@ def to16BitSigned(value):
 
 def to32BitUnsigned(value):
     return value.to_bytes(length=4, byteorder='little', signed=False)
+
+def toString(text):
+    return to16BitUnsigned(len(text)) + bytearray(text, encoding='ascii')
 
 
 class NetworkClient:
@@ -78,12 +83,27 @@ class NetworkClient:
 
     def smallText(self, x, y, text):
         self.sendPacket(
-            to16BitUnsigned(Command.SMALL_TEXT.value) + to16BitUnsigned(x) + to16BitUnsigned(y) + to16BitUnsigned(
-                len(text)) + bytearray(text, encoding='ascii')
+            to16BitUnsigned(Command.SMALL_TEXT.value) + to16BitUnsigned(x) + to16BitUnsigned(y) + toString(text)
         )
 
     def largeText(self, x, y, text):
         self.sendPacket(
-            to16BitUnsigned(Command.LARGE_TEXT.value) + to16BitUnsigned(x) + to16BitUnsigned(y) + to16BitUnsigned(
-                len(text)) + bytearray(text, encoding='ascii')
+            to16BitUnsigned(Command.LARGE_TEXT.value) + to16BitUnsigned(x) + to16BitUnsigned(y) + toString(text)
+        )
+
+    def defineImage(self, name, image):
+        width = image.size[0]
+        height = image.size[1]
+        packet = to16BitUnsigned(Command.DEFINE_IMAGE.value) + toString(name) + to16BitUnsigned(width) + to16BitUnsigned(height)
+        for x in range(0, width):
+            for y in range(0, height):
+                pixel = image.getpixel((x, y))
+                packet = packet + to8BitUnsigned(pixel[0]) + to8BitUnsigned(pixel[1]) + to8BitUnsigned(pixel[2])
+
+        self.sendPacket(packet)
+
+
+    def image(self, x, y, name):
+        self.sendPacket(
+            to16BitUnsigned(Command.DRAW_IMAGE.value) + to16BitUnsigned(x) + to16BitUnsigned(y) + toString(name)
         )

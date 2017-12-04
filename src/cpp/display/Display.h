@@ -1,8 +1,10 @@
 #ifndef DISPLAYSERVER_DISPLAY_H
 #define DISPLAYSERVER_DISPLAY_H
 
+#include <map>
 #include <string>
 #include <boost/shared_ptr.hpp>
+#include "Image.h"
 
 class Display {
 public:
@@ -24,9 +26,21 @@ public:
 
     virtual void DrawLargeText(int16_t x, int16_t y, std::string text) =0;
 
+    void DefineImage(const std::string &name, boost::shared_ptr<const Image> image);
+
+    virtual void DrawImage(int16_t x, int16_t y, const std::string &imageName) =0;
+
     virtual void Show() =0;
+
+protected:
+    boost::shared_ptr<const Image> GetImage(const std::string& name) const {
+        return _images.at(name);
+    }
+
+private:
+    std::map<std::string, boost::shared_ptr<const Image>> _images;
 };
 
-boost::shared_ptr<Display> createDisplay();
+boost::shared_ptr<Display> CreateDisplay();
 
 #endif //DISPLAYSERVER_DISPLAY_H

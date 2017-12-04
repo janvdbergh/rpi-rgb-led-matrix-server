@@ -114,10 +114,22 @@ void LedMatrixDisplay::DrawLargeText(int16_t x, int16_t y, std::string text) {
     DrawText(_frameCanvas, *_largeFont, x, y, _color, text.c_str());
 }
 
+void LedMatrixDisplay::DrawImage(int16_t x, int16_t y, const std::string &imageName) {
+    boost::shared_ptr<const Image> image = GetImage(imageName);
+
+    if (image) {
+        for (uint16_t i = 0; i < image->GetWidth(); i++) {
+            for (uint16_t j = 0; j < image->GetHeight(); j++) {
+                _frameCanvas->SetPixel(x + i, y + j, image->GetRed(i, j), image->GetGreen(i, j), image->GetBlue(i, j));
+            }
+        }
+    }
+}
+
 void LedMatrixDisplay::Show() {
     _frameCanvas = _rgbMatrix->SwapOnVSync(_frameCanvas);
 }
 
-boost::shared_ptr<Display> createDisplay() {
+boost::shared_ptr<Display> CreateDisplay() {
     return boost::shared_ptr<Display>(new LedMatrixDisplay());
 }

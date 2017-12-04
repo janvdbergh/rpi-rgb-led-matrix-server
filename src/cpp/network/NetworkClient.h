@@ -26,6 +26,10 @@ public:
 
     Client &DrawLargeText(int16_t x, int16_t y, const std::string &text);
 
+    Client &DefineImage(const std::string& name, boost::shared_ptr<const Image> image);
+
+    Client &DrawImage(int16_t x, int16_t y, const std::string &name);
+
     Client &Show();
 
 private:

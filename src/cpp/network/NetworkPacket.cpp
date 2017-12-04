@@ -53,7 +53,7 @@ PacketReader &PacketReader::operator>>(uint16_t &uint16) {
     return *this;
 }
 
-PacketReader & PacketReader::operator>>(const PacketReaderComplete &_) {
+PacketReader &PacketReader::operator>>(const PacketReaderComplete &_) {
     if (_packet.GetSize() != _position) {
         boost::throw_exception(InvalidSizeError(_position, _packet.GetSize()));
     }
@@ -63,23 +63,43 @@ PacketReader & PacketReader::operator>>(const PacketReaderComplete &_) {
 
 PacketReader &PacketReader::operator>>(std::string &string) {
     uint16_t length;
-    this->operator>>(length);
+    (*this) >> length;
 
     char chars[length + 1];
     Read(chars, length);
     chars[length] = '\0';
     string = chars;
 
-    std::cout << std::endl;
+    return *this;
+}
+
+PacketReader &PacketReader::operator>>(boost::shared_ptr<const Image> &image) {
+    uint16_t width, height;
+    (*this) >> width >> height;
+    ImageBuilder imageBuilder(width, height);
+
+    for (uint16_t x = 0; x < width; x++) {
+        for (uint16_t y = 0; y < height; y++) {
+            uint8_t red, green, blue;
+            (*this) >> red >> green >> blue;
+            imageBuilder.SetPixel(x, y, red, green, blue);
+        }
+    }
+
+    image = imageBuilder.Build();
 
     return *this;
 }
 
 template<typename T>
 void PacketWriter::Write(T &value) {
+    Write((void*)&value, sizeof(value));
+}
+
+void PacketWriter::Write(const void *data, size_t size) {
     size_t position = _data.size();
-    _data.resize(position + sizeof(value));
-    memcpy(&_data.front() + position, &value, sizeof(value));
+    _data.resize(position + size);
+    memcpy(&_data.front() + position, data, size);
 }
 
 PacketWriter &PacketWriter::operator<<(Command command) {
@@ -98,8 +118,26 @@ PacketWriter &PacketWriter::operator<<(int16_t value) {
     return *this;
 }
 
-PacketWriter &PacketWriter::operator<<(const std::string &value) {
+PacketWriter &PacketWriter::operator<<(uint16_t value) {
     Write(value);
+    return *this;
+}
+
+PacketWriter &PacketWriter::operator<<(const std::string &value) {
+    (*this) << (uint16_t) value.length();
+    Write(value.c_str(), value.length());
+    return *this;
+}
+
+PacketWriter &PacketWriter::operator<<(boost::shared_ptr<const Image> image) {
+    (*this) << image->GetWidth() << image->GetHeight();
+
+    for (uint16_t x = 0; x < image->GetWidth(); x++) {
+        for (uint16_t y = 0; y < image->GetHeight(); y++) {
+            (*this) << image->GetRed(x, y) << image->GetGreen(x, y) << image->GetBlue(x, y);
+        }
+    }
+
     return *this;
 }
 

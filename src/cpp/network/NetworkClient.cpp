@@ -53,6 +53,19 @@ Client &Client::DrawLargeText(int16_t x, int16_t y, const std::string &text) {
     return *this;
 }
 
+Client &Client::DefineImage(const std::string &name, boost::shared_ptr<const Image> image) {
+    WritePacket(PacketWriter() << DEFINE_IMAGE << name << image);
+
+    return *this;
+}
+
+Client &Client::DrawImage(int16_t x, int16_t y, const std::string &name) {
+    WritePacket(PacketWriter() << DRAW_IMAGE << x << y << name);
+
+
+    return *this;
+}
+
 Client &Client::Show() {
     WritePacket(PacketWriter() << SHOW);
     return *this;
@@ -65,7 +78,7 @@ void Client::WritePacket(const Packet &packet) {
     uint32_t size = packet.GetSize();
     std::vector<char> data = packet.GetData();
     uint32_t crc = packet.GetCRC();
-    
+
     bufs.push_back(boost::asio::buffer(&size, sizeof(size)));
     bufs.push_back(boost::asio::buffer(data.data(), size));
     bufs.push_back(boost::asio::buffer(&crc, sizeof(crc)));
