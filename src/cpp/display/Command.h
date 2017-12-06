@@ -10,6 +10,8 @@
 #include <utility>
 #include "Image.h"
 
+class Display;
+
 enum CommandCode {
     CLEAR,
     SHOW,
@@ -25,28 +27,38 @@ enum CommandCode {
 
 class Command {
 public:
-    virtual uint16_t GetCode() =0;
+    virtual uint16_t GetCode() const =0;
+
+    virtual void visit(Display &display) const =0;
 };
 
 class ClearCommand : public Command {
 public:
-    uint16_t GetCode() override {
+    ClearCommand() = default;
+
+    uint16_t GetCode() const override {
         return CommandCode::CLEAR;
     }
+
+    void visit(Display &display) const override;
 };
 
 class ShowCommand : public Command {
 public:
-    uint16_t GetCode() override {
+    ShowCommand() = default;
+
+    uint16_t GetCode() const override {
         return CommandCode::SHOW;
     }
+
+    void visit(Display &display) const override;
 };
 
 class ColorCommand : public Command {
 public:
     ColorCommand(uint8_t red, uint8_t green, uint8_t blue) : _red(red), _green(green), _blue(blue) {}
 
-    uint16_t GetCode() override {
+    uint16_t GetCode() const override {
         return CommandCode::COLOR;
     }
 
@@ -62,6 +74,8 @@ public:
         return _blue;
     }
 
+    void visit(Display &display) const override;
+
 
 private:
     uint8_t _red, _green, _blue;
@@ -71,7 +85,7 @@ class PixelCommand : public Command {
 public:
     PixelCommand(int16_t x, int16_t y) : _x(x), _y(y) {}
 
-    uint16_t GetCode() override {
+    uint16_t GetCode() const override {
         return CommandCode::PIXEL;
     }
 
@@ -83,6 +97,8 @@ public:
         return _y;
     }
 
+    void visit(Display &display) const override;
+
 private:
     int16_t _x, _y;
 };
@@ -92,7 +108,7 @@ public:
     RectangleCommand(int16_t x, int16_t y, uint16_t width, uint16_t height) : _x(x), _y(y), _width(width),
                                                                               _height(height) {}
 
-    uint16_t GetCode() override {
+    uint16_t GetCode() const override {
         return CommandCode::RECTANGLE;
     }
 
@@ -112,6 +128,8 @@ public:
         return _height;
     }
 
+    void visit(Display &display) const override;
+
 private:
     int16_t _x, _y;
     uint16_t _width, _height;
@@ -121,17 +139,19 @@ class DigitCommand : public Command {
 public:
     DigitCommand(uint8_t position, uint8_t digit) : _position(position), _digit(digit) {}
 
-    uint16_t GetCode() override {
+    uint16_t GetCode() const override {
         return CommandCode::DIGIT;
     }
 
-    uint8_t getPosition() const {
+    uint8_t GetPosition() const {
         return _position;
     }
 
-    uint8_t getDigit() const {
+    uint8_t GetDigit() const {
         return _digit;
     }
+
+    void visit(Display &display) const override;
 
 private:
     uint8_t _position, _digit;
@@ -141,7 +161,7 @@ class SmallTextCommand : public Command {
 public:
     SmallTextCommand(int16_t x, int16_t y, std::string text) : _x(x), _y(y), _text(std::move(text)) {}
 
-    uint16_t GetCode() override {
+    uint16_t GetCode() const override {
         return CommandCode::SMALL_TEXT;
     }
 
@@ -157,6 +177,8 @@ public:
         return _text;
     }
 
+    void visit(Display &display) const override;
+
 private:
     int16_t _x, _y;
     std::string _text;
@@ -166,7 +188,7 @@ class LargeTextCommand : public Command {
 public:
     LargeTextCommand(int16_t x, int16_t y, std::string text) : _x(x), _y(y), _text(std::move(text)) {}
 
-    uint16_t GetCode() override {
+    uint16_t GetCode() const override {
         return CommandCode::LARGE_TEXT;
     }
 
@@ -182,6 +204,8 @@ public:
         return _text;
     }
 
+    void visit(Display &display) const override;
+
 private:
     int16_t _x, _y;
     std::string _text;
@@ -192,20 +216,30 @@ public:
     DefineImageCommand(std::string name, boost::shared_ptr<const Image> image) : name(std::move(name)),
                                                                                  _image(std::move(image)) {}
 
-    uint16_t GetCode() override {
+    uint16_t GetCode() const override {
         return CommandCode::DEFINE_IMAGE;
     }
+
+    const std::string &GetName() const {
+        return name;
+    }
+
+    const boost::shared_ptr<const Image> &GetImage() const {
+        return _image;
+    }
+
+    void visit(Display &display) const override;
 
 private:
     std::string name;
     boost::shared_ptr<const Image> _image;
 };
 
-class DrawImageCommand : public Command {
+class ImageCommand : public Command {
 public:
-    DrawImageCommand(int16_t x, int16_t y, std::string name) : _x(x), _y(y), _name(std::move(name)) {}
+    ImageCommand(int16_t x, int16_t y, std::string name) : _x(x), _y(y), _name(std::move(name)) {}
 
-    uint16_t GetCode() override {
+    uint16_t GetCode() const override {
         return CommandCode::DRAW_IMAGE;
     }
 
@@ -220,6 +254,8 @@ public:
     const std::string &GetName() const {
         return _name;
     }
+
+    void visit(Display &display) const override;
 
 private:
     int16_t _x, _y;

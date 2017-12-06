@@ -4,11 +4,15 @@
 #include <map>
 #include <string>
 #include <boost/shared_ptr.hpp>
-#include "Image.h"
+#include "Command.h"
 
 class Display {
 public:
     virtual ~Display() = default;
+
+    void ExecuteCommand(const boost::shared_ptr<const Command>& command) {
+        command->visit(*this);
+    }
 
     virtual bool Initialize(int argc, char **argv) =0;
 
@@ -18,7 +22,7 @@ public:
 
     virtual void DrawPixel(int16_t x, int16_t y) =0;
 
-    virtual void DrawRectangle(int16_t x, int16_t y, int16_t width, int16_t height) =0;
+    virtual void DrawRectangle(int16_t x, int16_t y, uint16_t width, uint16_t height) =0;
 
     virtual void DrawDigit(uint8_t position, uint8_t digit) =0;
 
@@ -31,7 +35,6 @@ public:
     virtual void DrawImage(int16_t x, int16_t y, const std::string &imageName) =0;
 
     virtual void Show() =0;
-
 protected:
     boost::shared_ptr<const Image> GetImage(const std::string& name) const {
         return _images.at(name);

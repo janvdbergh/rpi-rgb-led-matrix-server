@@ -19,59 +19,58 @@ Client::~Client() {
 }
 
 Client & Client::SetColor(uint8_t r, uint8_t g, uint8_t b) {
-    WritePacket(PacketWriter() << COLOR << r << g << b);
+    SendCommand(boost::shared_ptr<const Command>(new ColorCommand(r, g, b)));
     return *this;
 }
 
 Client &Client::Clear() {
-    WritePacket(PacketWriter() << CLEAR);
+    SendCommand(boost::shared_ptr<const Command>(new ClearCommand()));
     return *this;
 }
 
 Client &Client::DrawPixel(int16_t x, int16_t y) {
-    WritePacket(PacketWriter() << PIXEL << x << y);
+    SendCommand(boost::shared_ptr<const Command>(new PixelCommand(x, y)));
     return *this;
 }
 
-Client &Client::DrawRectangle(int16_t x, int16_t y, int16_t width, int16_t height) {
-    WritePacket(PacketWriter() << RECTANGLE << x << y << width << height);
+Client &Client::DrawRectangle(int16_t x, int16_t y, uint16_t width, uint16_t height) {
+    SendCommand(boost::shared_ptr<const Command>(new RectangleCommand(x, y, width, height)));
     return *this;
 }
 
 Client &Client::DrawDigit(uint8_t position, uint8_t digit) {
-    WritePacket(PacketWriter() << DIGIT << position << digit);
+    SendCommand(boost::shared_ptr<const Command>(new DigitCommand(position, digit)));
     return *this;
 }
 
 Client &Client::DrawSmallText(int16_t x, int16_t y, const std::string &text) {
-    WritePacket(PacketWriter() << SMALL_TEXT << x << y << text);
+    SendCommand(boost::shared_ptr<const Command>(new SmallTextCommand(x, y, text)));
     return *this;
 }
 
 Client &Client::DrawLargeText(int16_t x, int16_t y, const std::string &text) {
-    WritePacket(PacketWriter() << LARGE_TEXT << x << y << text);
+    SendCommand(boost::shared_ptr<const Command>(new LargeTextCommand(x, y, text)));
     return *this;
 }
 
 Client &Client::DefineImage(const std::string &name, boost::shared_ptr<const Image> image) {
-    WritePacket(PacketWriter() << DEFINE_IMAGE << name << image);
-
+    SendCommand(boost::shared_ptr<const Command>(new DefineImageCommand(name, image)));
     return *this;
 }
 
 Client &Client::DrawImage(int16_t x, int16_t y, const std::string &name) {
-    WritePacket(PacketWriter() << DRAW_IMAGE << x << y << name);
-
-
+    SendCommand(boost::shared_ptr<const Command>(new ImageCommand(x, y, name)));
     return *this;
 }
 
 Client &Client::Show() {
-    WritePacket(PacketWriter() << SHOW);
+    SendCommand(boost::shared_ptr<const Command>(new ShowCommand()));
     return *this;
 }
 
-void Client::WritePacket(const Packet &packet) {
+void Client::SendCommand(const boost::shared_ptr<const Command> &command) {
+    Packet packet(command);
+
     std::vector<boost::asio::mutable_buffer> bufs;
     boost::system::error_code error;
 

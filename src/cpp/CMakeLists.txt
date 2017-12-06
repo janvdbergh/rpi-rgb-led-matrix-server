@@ -34,7 +34,9 @@ target_link_libraries(DisplayServerMock ${Boost_LIBRARIES} pthread)
 
 # Client library
 add_library(NetworkClient SHARED
+        display/Command.cpp
         display/Image.cpp
+        display/Display.cpp
         network/NetworkPacket.cpp
         network/NetworkError.cpp
         network/NetworkClient.cpp
