@@ -7,19 +7,6 @@
 
 const uint32_t MAX_PACKET_SIZE = 8192;
 
-enum Command {
-    CLEAR,
-    SHOW,
-    COLOR,
-    PIXEL,
-    RECTANGLE,
-    DIGIT,
-    SMALL_TEXT,
-    LARGE_TEXT,
-    DEFINE_IMAGE,
-    DRAW_IMAGE
-};
-
 class Packet {
 public:
     explicit Packet(std::vector<char> data) { _data = std::move(data); }

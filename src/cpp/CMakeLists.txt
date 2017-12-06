@@ -14,10 +14,10 @@ add_executable(DisplayServerLed
         network/NetworkPacket.cpp
         network/NetworkServer.cpp
         display/Image.cpp
+        display/Command.cpp
         display/Display.cpp
         display/LedMatrixDisplay.cpp
-        network/NetworkError.h
-        display/Image.cpp display/Image.h)
+        network/NetworkError.h)
 target_link_libraries(DisplayServerLed rgbmatrix ${Boost_LIBRARIES} pthread)
 
 # Mock display
@@ -27,9 +27,9 @@ add_executable(DisplayServerMock
         network/NetworkPacket.cpp
         network/NetworkServer.cpp
         display/Image.cpp
+        display/Command.cpp
         display/Display.cpp
-        display/MockDisplay.cpp
-        )
+        display/MockDisplay.cpp)
 target_link_libraries(DisplayServerMock ${Boost_LIBRARIES} pthread)
 
 # Client library
