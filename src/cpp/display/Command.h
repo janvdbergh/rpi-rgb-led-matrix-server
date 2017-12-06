@@ -22,12 +22,13 @@ enum CommandCode {
     SMALL_TEXT,
     LARGE_TEXT,
     DEFINE_IMAGE,
-    DRAW_IMAGE
+    DRAW_IMAGE,
+    DEFINE_ANIMATION
 };
 
 class Command {
 public:
-    virtual uint16_t GetCode() const =0;
+    virtual CommandCode GetCode() const =0;
 
     virtual void visit(Display &display) const =0;
 };
@@ -36,7 +37,7 @@ class ClearCommand : public Command {
 public:
     ClearCommand() = default;
 
-    uint16_t GetCode() const override {
+    CommandCode GetCode() const override {
         return CommandCode::CLEAR;
     }
 
@@ -47,7 +48,7 @@ class ShowCommand : public Command {
 public:
     ShowCommand() = default;
 
-    uint16_t GetCode() const override {
+    CommandCode GetCode() const override {
         return CommandCode::SHOW;
     }
 
@@ -58,7 +59,7 @@ class ColorCommand : public Command {
 public:
     ColorCommand(uint8_t red, uint8_t green, uint8_t blue) : _red(red), _green(green), _blue(blue) {}
 
-    uint16_t GetCode() const override {
+    CommandCode GetCode() const override {
         return CommandCode::COLOR;
     }
 
@@ -85,7 +86,7 @@ class PixelCommand : public Command {
 public:
     PixelCommand(int16_t x, int16_t y) : _x(x), _y(y) {}
 
-    uint16_t GetCode() const override {
+    CommandCode GetCode() const override {
         return CommandCode::PIXEL;
     }
 
@@ -108,7 +109,7 @@ public:
     RectangleCommand(int16_t x, int16_t y, uint16_t width, uint16_t height) : _x(x), _y(y), _width(width),
                                                                               _height(height) {}
 
-    uint16_t GetCode() const override {
+    CommandCode GetCode() const override {
         return CommandCode::RECTANGLE;
     }
 
@@ -139,7 +140,7 @@ class DigitCommand : public Command {
 public:
     DigitCommand(uint8_t position, uint8_t digit) : _position(position), _digit(digit) {}
 
-    uint16_t GetCode() const override {
+    CommandCode GetCode() const override {
         return CommandCode::DIGIT;
     }
 
@@ -161,7 +162,7 @@ class SmallTextCommand : public Command {
 public:
     SmallTextCommand(int16_t x, int16_t y, std::string text) : _x(x), _y(y), _text(std::move(text)) {}
 
-    uint16_t GetCode() const override {
+    CommandCode GetCode() const override {
         return CommandCode::SMALL_TEXT;
     }
 
@@ -188,7 +189,7 @@ class LargeTextCommand : public Command {
 public:
     LargeTextCommand(int16_t x, int16_t y, std::string text) : _x(x), _y(y), _text(std::move(text)) {}
 
-    uint16_t GetCode() const override {
+    CommandCode GetCode() const override {
         return CommandCode::LARGE_TEXT;
     }
 
@@ -216,7 +217,7 @@ public:
     DefineImageCommand(std::string name, boost::shared_ptr<const Image> image) : name(std::move(name)),
                                                                                  _image(std::move(image)) {}
 
-    uint16_t GetCode() const override {
+    CommandCode GetCode() const override {
         return CommandCode::DEFINE_IMAGE;
     }
 
@@ -239,7 +240,7 @@ class ImageCommand : public Command {
 public:
     ImageCommand(int16_t x, int16_t y, std::string name) : _x(x), _y(y), _name(std::move(name)) {}
 
-    uint16_t GetCode() const override {
+    CommandCode GetCode() const override {
         return CommandCode::DRAW_IMAGE;
     }
 
@@ -260,6 +261,30 @@ public:
 private:
     int16_t _x, _y;
     std::string _name;
+};
+
+class DefineAnimationCommand : public Command {
+public:
+    DefineAnimationCommand(const std::string &name, const std::vector<boost::shared_ptr<const Command>> &commands) : _name(name),
+                                                                                                       _commands(commands) {}
+
+    CommandCode GetCode() const override {
+        return CommandCode::DEFINE_ANIMATION;
+    }
+
+    const std::string &GetName() const {
+        return _name;
+    }
+
+    std::vector<boost::shared_ptr<const Command>> GetCommands() const {
+        return _commands;
+    }
+
+    void visit(Display &display) const override;
+
+private:
+    std::string _name;
+    std::vector<boost::shared_ptr<const Command>> _commands;
 };
 
 #endif //DISPLAYSERVER_COMMAND_H

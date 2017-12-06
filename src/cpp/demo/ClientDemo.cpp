@@ -12,15 +12,18 @@ int main(int argc, char *argv[]) {
     imageBuilder.SetPixel(1, 0, 7, 8, 9);
     imageBuilder.SetPixel(1, 1, 10, 11, 12);
 
-    client
-            .DefineImage("test", imageBuilder.Build())
-            .Clear()
-            .SetColor(128, 128, 128)
-            .DrawPixel(12, 12)
-            .DrawImage(5, 5, "test")
-            .Show();
+    std::vector<boost::shared_ptr<const Command>> commands;
+    commands.push_back(boost::shared_ptr<const Command>(new ClearCommand));
+    commands.push_back(boost::shared_ptr<const Command>(new ColorCommand(128, 128, 128)));
+    commands.push_back(boost::shared_ptr<const Command>(new PixelCommand(12, 12)));
+    commands.push_back(boost::shared_ptr<const Command>(new ImageCommand(5, 5, "test")));
+    commands.push_back(boost::shared_ptr<const Command>(new ShowCommand()));
 
-    sleep(8);
+    client
+            .SendCommand(boost::shared_ptr<const Command>(new DefineImageCommand("test", imageBuilder.Build())))
+            .SendCommand(boost::shared_ptr<const Command>(new DefineAnimationCommand("animation", commands)));
+
+    sleep(3);
 
     return 0;
 }

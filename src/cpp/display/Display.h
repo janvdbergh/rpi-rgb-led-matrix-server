@@ -10,7 +10,7 @@ class Display {
 public:
     virtual ~Display() = default;
 
-    void ExecuteCommand(const boost::shared_ptr<const Command>& command) {
+    void ExecuteCommand(const boost::shared_ptr<const Command> &command) {
         command->visit(*this);
     }
 
@@ -30,18 +30,22 @@ public:
 
     virtual void DrawLargeText(int16_t x, int16_t y, std::string text) =0;
 
-    void DefineImage(const std::string &name, boost::shared_ptr<const Image> image);
+    void DefineImage(const std::string &name, const boost::shared_ptr<const Image> &image);
 
     virtual void DrawImage(int16_t x, int16_t y, const std::string &imageName) =0;
 
     virtual void Show() =0;
+
+    virtual void DefineAnimation(const std::string &name, const std::vector<boost::shared_ptr<const Command>> &commands);
+
 protected:
-    boost::shared_ptr<const Image> GetImage(const std::string& name) const {
+    boost::shared_ptr<const Image> GetImage(const std::string &name) const {
         return _images.at(name);
     }
 
 private:
     std::map<std::string, boost::shared_ptr<const Image>> _images;
+    std::map<std::string, std::vector<boost::shared_ptr<const Command>>> _commands;
 };
 
 boost::shared_ptr<Display> CreateDisplay();

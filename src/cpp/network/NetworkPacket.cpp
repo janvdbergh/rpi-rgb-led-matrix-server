@@ -9,17 +9,7 @@ class PacketReader {
 public:
     explicit PacketReader(std::vector<char> data) : _data(std::move(data)), _position(0) {}
 
-    CommandCode ReadCommandCode();
-
-    uint8_t ReadUint8();
-
-    uint16_t ReadUint16();
-
-    int16_t ReadInt16();
-
-    std::string ReadString();
-
-    boost::shared_ptr<const Image> ReadImage();
+    boost::shared_ptr<const Command> ReadCommand();
 
     void complete();
 
@@ -31,6 +21,18 @@ private:
     void Read(T &resultHolder);
 
     void Read(void *dataHolder, size_t size);
+
+    CommandCode ReadCommandCode();
+
+    uint8_t ReadUint8();
+
+    uint16_t ReadUint16();
+
+    int16_t ReadInt16();
+
+    std::string ReadString();
+
+    boost::shared_ptr<const Image> ReadImage();
 };
 
 class PacketWriter {
@@ -38,6 +40,16 @@ public:
     PacketWriter() = default;
 
     const std::vector<char> &GetData() { return _data; }
+
+    void Write(const boost::shared_ptr<const Command> &command);
+
+private:
+    std::vector<char> _data;
+
+    template<typename T>
+    void Write(const T &value);
+
+    void Write(const void *data, size_t size);
 
     void Write(const CommandCode &commandCode);
 
@@ -50,14 +62,6 @@ public:
     void Write(const std::string &string);
 
     void Write(const boost::shared_ptr<const Image> &image);
-
-private:
-    std::vector<char> _data;
-
-    template<typename T>
-    void Write(const T &value);
-
-    void Write(const void *data, size_t size);
 };
 
 uint32_t Packet::GetCRC() const {
@@ -66,138 +70,17 @@ uint32_t Packet::GetCRC() const {
     return static_cast<uint32_t>(result.checksum());
 }
 
-Packet::Packet(const boost::shared_ptr<const Command>& command) {
+Packet::Packet(const boost::shared_ptr<const Command> &command) {
     PacketWriter writer;
-    writer.Write(command->GetCode());
-
-    switch (command->GetCode()) {
-        case CommandCode::CLEAR:
-        case CommandCode::SHOW: {
-            // no extra data
-            break;
-        }
-
-        case CommandCode::COLOR: {
-            auto &colorCommand = (const ColorCommand &) *command;
-            writer.Write(colorCommand.GetRed());
-            writer.Write(colorCommand.GetGreen());
-            writer.Write(colorCommand.GetBlue());
-            break;
-        }
-
-        case CommandCode::PIXEL: {
-            auto &pixelCommand = (const PixelCommand &) *command;
-            writer.Write(pixelCommand.GetX());
-            writer.Write(pixelCommand.GetY());
-            break;
-        }
-
-        case CommandCode::RECTANGLE: {
-            auto &rectangleCommand = (const RectangleCommand &) *command;
-            writer.Write(rectangleCommand.GetX());
-            writer.Write(rectangleCommand.GetY());
-            writer.Write(rectangleCommand.GetWidth());
-            writer.Write(rectangleCommand.GetHeight());
-            break;
-        }
-
-        case CommandCode::DIGIT: {
-            auto &digitCommand = (const DigitCommand &) *command;
-            writer.Write(digitCommand.GetPosition());
-            writer.Write(digitCommand.GetDigit());
-            break;
-        }
-
-        case CommandCode::SMALL_TEXT: {
-            auto &smallTextCommand = (const SmallTextCommand &) *command;
-            writer.Write(smallTextCommand.GetX());
-            writer.Write(smallTextCommand.GetY());
-            writer.Write(smallTextCommand.GetText());
-            break;
-        }
-
-        case CommandCode::LARGE_TEXT: {
-            auto &largeTextCommand = (const LargeTextCommand &) *command;
-            writer.Write(largeTextCommand.GetX());
-            writer.Write(largeTextCommand.GetY());
-            writer.Write(largeTextCommand.GetText());
-            break;
-        }
-
-        case CommandCode::DEFINE_IMAGE: {
-            auto &defineImageCommand = (const DefineImageCommand &) *command;
-            writer.Write(defineImageCommand.GetName());
-            writer.Write(defineImageCommand.GetImage());
-            break;
-        }
-
-        case CommandCode::DRAW_IMAGE: {
-            auto &drawImageCommand = (const ImageCommand &) *command;
-            writer.Write(drawImageCommand.GetX());
-            writer.Write(drawImageCommand.GetY());
-            writer.Write(drawImageCommand.GetName());
-            break;
-        }
-
-        default:
-            boost::throw_exception(UnknownCommandError(command->GetCode()));
-    }
-
+    writer.Write(command);
     _data = writer.GetData();
 }
 
 boost::shared_ptr<const Command> Packet::GetCommand() const {
     PacketReader reader(_data);
-
-    boost::shared_ptr<const Command> result;
-
-    CommandCode commandCode = reader.ReadCommandCode();
-    switch (commandCode) {
-        case CommandCode::CLEAR:
-            result = boost::shared_ptr<Command>(new ClearCommand());
-            break;
-
-        case CommandCode::SHOW:
-            result = boost::shared_ptr<Command>(new ShowCommand());
-            break;
-
-        case CommandCode::COLOR:
-            result = boost::shared_ptr<Command>(new ColorCommand(reader.ReadUint8(), reader.ReadUint8(), reader.ReadUint8()));
-            break;
-
-        case CommandCode::PIXEL:
-            result = boost::shared_ptr<Command>(new PixelCommand(reader.ReadInt16(), reader.ReadInt16()));
-            break;
-
-        case CommandCode::RECTANGLE:
-            result = boost::shared_ptr<Command>(new RectangleCommand(reader.ReadInt16(), reader.ReadInt16(), reader.ReadUint16(), reader.ReadUint16()));
-            break;
-
-        case CommandCode::DIGIT:
-            result = boost::shared_ptr<Command>(new DigitCommand(reader.ReadUint8(), reader.ReadUint8()));
-            break;
-
-        case CommandCode::SMALL_TEXT:
-            result = boost::shared_ptr<Command>(new SmallTextCommand(reader.ReadInt16(), reader.ReadInt16(), reader.ReadString()));
-            break;
-
-        case CommandCode::LARGE_TEXT:
-            result = boost::shared_ptr<Command>(new LargeTextCommand(reader.ReadInt16(), reader.ReadInt16(), reader.ReadString()));
-            break;
-
-        case CommandCode::DEFINE_IMAGE:
-            result = boost::shared_ptr<Command>(new DefineImageCommand(reader.ReadString(), reader.ReadImage()));
-            break;
-
-        case CommandCode::DRAW_IMAGE:
-            result = boost::shared_ptr<Command>(new ImageCommand(reader.ReadInt16(), reader.ReadInt16(), reader.ReadString()));
-            break;
-
-        default:
-            boost::throw_exception(UnknownCommandError(commandCode));
-    }
-
+    boost::shared_ptr<const Command> result = reader.ReadCommand();
     reader.complete();
+
     return result;
 }
 
@@ -276,6 +159,56 @@ void PacketReader::complete() {
     }
 }
 
+boost::shared_ptr<const Command> PacketReader::ReadCommand() {
+    CommandCode commandCode = ReadCommandCode();
+    switch (commandCode) {
+        case CommandCode::CLEAR:
+            return boost::shared_ptr<const Command>(new ClearCommand());
+
+        case CommandCode::SHOW:
+            return boost::shared_ptr<const Command>(new ShowCommand());
+
+        case CommandCode::COLOR:
+            return boost::shared_ptr<const Command>(new ColorCommand(ReadUint8(), ReadUint8(), ReadUint8()));
+
+        case CommandCode::PIXEL:
+            return boost::shared_ptr<const Command>(new PixelCommand(ReadInt16(), ReadInt16()));
+
+        case CommandCode::RECTANGLE:
+            return boost::shared_ptr<const Command>(
+                    new RectangleCommand(ReadInt16(), ReadInt16(), ReadUint16(), ReadUint16()));
+
+        case CommandCode::DIGIT:
+            return boost::shared_ptr<const Command>(new DigitCommand(ReadUint8(), ReadUint8()));
+
+        case CommandCode::SMALL_TEXT:
+            return boost::shared_ptr<const Command>(new SmallTextCommand(ReadInt16(), ReadInt16(), ReadString()));
+
+        case CommandCode::LARGE_TEXT:
+            return boost::shared_ptr<const Command>(new LargeTextCommand(ReadInt16(), ReadInt16(), ReadString()));
+
+        case CommandCode::DEFINE_IMAGE:
+            return boost::shared_ptr<const Command>(new DefineImageCommand(ReadString(), ReadImage()));
+
+        case CommandCode::DRAW_IMAGE:
+            return boost::shared_ptr<const Command>(new ImageCommand(ReadInt16(), ReadInt16(), ReadString()));
+
+        case CommandCode::DEFINE_ANIMATION: {
+            std::string name = ReadString();
+            uint16_t numberOfCommands = ReadUint16();
+            std::vector<boost::shared_ptr<const Command>> commands(numberOfCommands);
+            for (int i = 0; i < numberOfCommands; i++) {
+                commands.push_back(ReadCommand());
+            }
+
+            return boost::shared_ptr<const Command>(new DefineAnimationCommand(ReadString(), commands));
+        }
+
+        default:
+            boost::throw_exception(UnknownCommandError(commandCode));
+    }
+}
+
 template<typename T>
 void PacketWriter::Write(const T &value) {
     Write((void *) &value, sizeof(value));
@@ -318,5 +251,92 @@ void PacketWriter::Write(const boost::shared_ptr<const Image> &image) {
             Write(image->GetGreen(x, y));
             Write(image->GetBlue(x, y));
         }
+    }
+}
+
+void PacketWriter::Write(const boost::shared_ptr<const Command> &command) {
+    Write(command->GetCode());
+
+    switch (command->GetCode()) {
+        case CommandCode::CLEAR:
+        case CommandCode::SHOW: {
+            // no extra data
+            break;
+        }
+
+        case CommandCode::COLOR: {
+            auto &colorCommand = (const ColorCommand &) *command;
+            Write(colorCommand.GetRed());
+            Write(colorCommand.GetGreen());
+            Write(colorCommand.GetBlue());
+            break;
+        }
+
+        case CommandCode::PIXEL: {
+            auto &pixelCommand = (const PixelCommand &) *command;
+            Write(pixelCommand.GetX());
+            Write(pixelCommand.GetY());
+            break;
+        }
+
+        case CommandCode::RECTANGLE: {
+            auto &rectangleCommand = (const RectangleCommand &) *command;
+            Write(rectangleCommand.GetX());
+            Write(rectangleCommand.GetY());
+            Write(rectangleCommand.GetWidth());
+            Write(rectangleCommand.GetHeight());
+            break;
+        }
+
+        case CommandCode::DIGIT: {
+            auto &digitCommand = (const DigitCommand &) *command;
+            Write(digitCommand.GetPosition());
+            Write(digitCommand.GetDigit());
+            break;
+        }
+
+        case CommandCode::SMALL_TEXT: {
+            auto &smallTextCommand = (const SmallTextCommand &) *command;
+            Write(smallTextCommand.GetX());
+            Write(smallTextCommand.GetY());
+            Write(smallTextCommand.GetText());
+            break;
+        }
+
+        case CommandCode::LARGE_TEXT: {
+            auto &largeTextCommand = (const LargeTextCommand &) *command;
+            Write(largeTextCommand.GetX());
+            Write(largeTextCommand.GetY());
+            Write(largeTextCommand.GetText());
+            break;
+        }
+
+        case CommandCode::DEFINE_IMAGE: {
+            auto &defineImageCommand = (const DefineImageCommand &) *command;
+            Write(defineImageCommand.GetName());
+            Write(defineImageCommand.GetImage());
+            break;
+        }
+
+        case CommandCode::DRAW_IMAGE: {
+            auto &drawImageCommand = (const ImageCommand &) *command;
+            Write(drawImageCommand.GetX());
+            Write(drawImageCommand.GetY());
+            Write(drawImageCommand.GetName());
+            break;
+        }
+
+        case CommandCode::DEFINE_ANIMATION: {
+            auto &defineAnimationCommand = (const DefineAnimationCommand &) *command;
+            Write(defineAnimationCommand.GetName());
+            Write((uint16_t )defineAnimationCommand.GetCommands().size());
+            for (auto &it : defineAnimationCommand.GetCommands()) {
+                Write(it);
+            }
+            break;
+        }
+
+        default:
+            boost::throw_exception(UnknownCommandError(command->GetCode()));
     }
 }

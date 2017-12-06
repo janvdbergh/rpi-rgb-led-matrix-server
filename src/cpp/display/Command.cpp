@@ -43,3 +43,7 @@ void DefineImageCommand::visit(Display &display) const {
 void ImageCommand::visit(Display &display) const {
     display.DrawImage(GetX(), GetY(), GetName());
 }
+
+void DefineAnimationCommand::visit(Display &display) const {
+    display.DefineAnimation(GetName(), GetCommands());
+}
