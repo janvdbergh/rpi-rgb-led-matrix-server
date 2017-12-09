@@ -21,10 +21,11 @@ enum CommandCode {
     DIGIT,
     SMALL_TEXT,
     LARGE_TEXT,
-    DEFINE_IMAGE,
-    DRAW_IMAGE,
-    COMPOSITE,
+    IMAGE,
+    ANIMATION,
     SLEEP,
+    COMPOSITE,
+    DEFINE_IMAGE,
     DEFINE_ANIMATION
 };
 
@@ -217,35 +218,12 @@ private:
     std::string _text;
 };
 
-class DefineImageCommand : public Command {
-public:
-    DefineImageCommand(std::string name, ImagePtr image) : name(std::move(name)), _image(std::move(image)) {}
-
-    CommandCode GetCode() const override {
-        return CommandCode::DEFINE_IMAGE;
-    }
-
-    const std::string &GetName() const {
-        return name;
-    }
-
-    const ImagePtr &GetImage() const {
-        return _image;
-    }
-
-    void Visit(Display &display) const override;
-
-private:
-    std::string name;
-    ImagePtr _image;
-};
-
 class ImageCommand : public Command {
 public:
     ImageCommand(int16_t x, int16_t y, std::string name) : _x(x), _y(y), _name(std::move(name)) {}
 
     CommandCode GetCode() const override {
-        return CommandCode::DRAW_IMAGE;
+        return CommandCode::IMAGE;
     }
 
     int16_t GetX() const {
@@ -264,6 +242,24 @@ public:
 
 private:
     int16_t _x, _y;
+    std::string _name;
+};
+
+class AnimationCommand : public Command {
+public:
+    AnimationCommand(std::string name) : _name(std::move(name)) {}
+
+    CommandCode GetCode() const override {
+        return CommandCode::ANIMATION;
+    }
+
+    const std::string &GetName() const {
+        return _name;
+    }
+
+    void Visit(Display &display) const override;
+
+private:
     std::string _name;
 };
 
@@ -306,6 +302,30 @@ public:
 
 private:
     CommandVector _commands;
+};
+
+
+class DefineImageCommand : public Command {
+public:
+    DefineImageCommand(std::string name, ImagePtr image) : name(std::move(name)), _image(std::move(image)) {}
+
+    CommandCode GetCode() const override {
+        return CommandCode::DEFINE_IMAGE;
+    }
+
+    const std::string &GetName() const {
+        return name;
+    }
+
+    const ImagePtr &GetImage() const {
+        return _image;
+    }
+
+    void Visit(Display &display) const override;
+
+private:
+    std::string name;
+    ImagePtr _image;
 };
 
 class DefineAnimationCommand : public Command {

@@ -30,24 +30,30 @@ public:
 
     virtual void DrawLargeText(int16_t x, int16_t y, std::string text) =0;
 
-    void DefineImage(const std::string &name, const ImagePtr &image);
-
     virtual void DrawImage(int16_t x, int16_t y, const std::string &imageName) =0;
+
+    virtual void ShowAnimation(const std::string &name);
 
     virtual void Sleep(uint16_t millis);
 
     virtual void Show() =0;
 
+    void DefineImage(const std::string &name, const ImagePtr &image);
+
     virtual void DefineAnimation(const std::string &name, const CommandPtr &command);
 
 protected:
-    ImagePtr GetImage(const std::string &name) const {
+    const ImagePtr GetImage(const std::string &name) const {
         return _images.at(name);
+    }
+
+    const CommandPtr GetAnimation(const std::string &name) const {
+        return _animations.at(name);
     }
 
 private:
     std::map<std::string, ImagePtr> _images;
-    std::map<std::string, CommandPtr> _command;
+    std::map<std::string, CommandPtr> _animations;
 };
 
 boost::shared_ptr<Display> CreateDisplay();

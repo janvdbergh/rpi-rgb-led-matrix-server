@@ -16,13 +16,15 @@ int main(int argc, char *argv[]) {
     commands.emplace_back(CommandPtr(new ClearCommand()));
     commands.emplace_back(CommandPtr(new ColorCommand(128, 128, 128)));
     commands.emplace_back(CommandPtr(new PixelCommand(12, 12)));
+    commands.emplace_back(CommandPtr(new SmallTextCommand(5, 25, "test")));
     commands.emplace_back(CommandPtr(new ImageCommand(5, 5, "test")));
     commands.emplace_back(CommandPtr(new ShowCommand()));
     CommandPtr composite = CommandPtr(new CompositeCommand(commands));
 
     client
             .SendCommand(CommandPtr(new DefineImageCommand("test", imageBuilder.Build())))
-            .SendCommand(CommandPtr(new DefineAnimationCommand("animation", composite)));
+            .SendCommand(CommandPtr(new DefineAnimationCommand("animation", composite)))
+            .SendCommand(CommandPtr(new AnimationCommand("animation")));
     sleep(3);
 
     return 0;

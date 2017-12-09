@@ -187,15 +187,19 @@ CommandPtr PacketReader::ReadCommand() {
         case CommandCode::LARGE_TEXT:
             return CommandPtr(new LargeTextCommand(ReadInt16(), ReadInt16(), ReadString()));
 
-        case CommandCode::DEFINE_IMAGE:
-            return CommandPtr(new DefineImageCommand(ReadString(), ReadImage()));
-
-        case CommandCode::DRAW_IMAGE:
+        case CommandCode::IMAGE:
             return CommandPtr(new ImageCommand(ReadInt16(), ReadInt16(), ReadString()));
+
+        case CommandCode::ANIMATION:
+            return CommandPtr(new AnimationCommand(ReadString()));
+
+        case CommandCode::SLEEP:
+            return CommandPtr(new SleepCommand(ReadUint16()));
 
         case CommandCode::COMPOSITE: {
             uint16_t numberOfCommands = ReadUint16();
-            std::vector<CommandPtr> commands(numberOfCommands);
+            std::vector<CommandPtr> commands;
+            commands.reserve(numberOfCommands);
             for (int i = 0; i < numberOfCommands; i++) {
                 commands.push_back(ReadCommand());
             }
@@ -203,8 +207,8 @@ CommandPtr PacketReader::ReadCommand() {
             return CommandPtr(new CompositeCommand(commands));
         }
 
-        case CommandCode::SLEEP:
-            return CommandPtr(new SleepCommand(ReadUint16()));
+        case CommandCode::DEFINE_IMAGE:
+            return CommandPtr(new DefineImageCommand(ReadString(), ReadImage()));
 
         case CommandCode::DEFINE_ANIMATION:
             return CommandPtr(new DefineAnimationCommand(ReadString(), ReadCommand()));
@@ -316,18 +320,23 @@ void PacketWriter::Write(const CommandPtr &command) {
             break;
         }
 
-        case CommandCode::DEFINE_IMAGE: {
-            auto &defineImageCommand = (const DefineImageCommand &) *command;
-            Write(defineImageCommand.GetName());
-            Write(defineImageCommand.GetImage());
-            break;
-        }
-
-        case CommandCode::DRAW_IMAGE: {
+        case CommandCode::IMAGE: {
             auto &drawImageCommand = (const ImageCommand &) *command;
             Write(drawImageCommand.GetX());
             Write(drawImageCommand.GetY());
             Write(drawImageCommand.GetName());
+            break;
+        }
+
+        case CommandCode::ANIMATION: {
+            auto &animationCommand = (const AnimationCommand &) *command;
+            Write(animationCommand.GetName());
+            break;
+        }
+
+        case CommandCode::SLEEP: {
+            auto &sleepCommand = (const SleepCommand &) *command;
+            Write(sleepCommand.GetMillis());
             break;
         }
 
@@ -340,9 +349,10 @@ void PacketWriter::Write(const CommandPtr &command) {
             break;
         }
 
-        case CommandCode::SLEEP: {
-            auto &sleepCommand = (const SleepCommand&)*command;
-            Write(sleepCommand.GetMillis());
+        case CommandCode::DEFINE_IMAGE: {
+            auto &defineImageCommand = (const DefineImageCommand &) *command;
+            Write(defineImageCommand.GetName());
+            Write(defineImageCommand.GetImage());
             break;
         }
 

@@ -36,12 +36,16 @@ void LargeTextCommand::Visit(Display &display) const {
     display.DrawLargeText(GetX(), GetY(), GetText());
 }
 
-void DefineImageCommand::Visit(Display &display) const {
-    display.DefineImage(GetName(), GetImage());
+void SleepCommand::Visit(Display &display) const {
+    display.Sleep(GetMillis());
 }
 
 void ImageCommand::Visit(Display &display) const {
     display.DrawImage(GetX(), GetY(), GetName());
+}
+
+void AnimationCommand::Visit(Display &display) const {
+    display.ShowAnimation(GetName());
 }
 
 void CompositeCommand::Visit(Display &display) const {
@@ -50,8 +54,8 @@ void CompositeCommand::Visit(Display &display) const {
     }
 }
 
-void SleepCommand::Visit(Display &display) const {
-    display.Sleep(GetMillis());
+void DefineImageCommand::Visit(Display &display) const {
+    display.DefineImage(GetName(), GetImage());
 }
 
 void DefineAnimationCommand::Visit(Display &display) const {
