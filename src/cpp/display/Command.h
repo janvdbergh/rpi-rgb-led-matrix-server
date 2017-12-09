@@ -24,6 +24,7 @@ enum CommandCode {
     DEFINE_IMAGE,
     DRAW_IMAGE,
     COMPOSITE,
+    SLEEP,
     DEFINE_ANIMATION
 };
 
@@ -218,8 +219,7 @@ private:
 
 class DefineImageCommand : public Command {
 public:
-    DefineImageCommand(std::string name, boost::shared_ptr<const Image> image) : name(std::move(name)),
-                                                                                 _image(std::move(image)) {}
+    DefineImageCommand(std::string name, ImagePtr image) : name(std::move(name)), _image(std::move(image)) {}
 
     CommandCode GetCode() const override {
         return CommandCode::DEFINE_IMAGE;
@@ -229,7 +229,7 @@ public:
         return name;
     }
 
-    const boost::shared_ptr<const Image> &GetImage() const {
+    const ImagePtr &GetImage() const {
         return _image;
     }
 
@@ -237,7 +237,7 @@ public:
 
 private:
     std::string name;
-    boost::shared_ptr<const Image> _image;
+    ImagePtr _image;
 };
 
 class ImageCommand : public Command {
@@ -267,6 +267,24 @@ private:
     std::string _name;
 };
 
+class SleepCommand : public Command {
+public:
+    explicit SleepCommand(uint16_t millis) : _millis(millis) {}
+
+    CommandCode GetCode() const override {
+        return CommandCode::SLEEP;
+    };
+
+    uint16_t GetMillis() const {
+        return _millis;
+    }
+
+    void Visit(Display &display) const override;
+
+private:
+    uint16_t _millis;
+};
+
 class CompositeCommand : public Command {
 public:
     explicit CompositeCommand(const CommandVector &commands) : _commands(commands) {}
@@ -292,7 +310,8 @@ private:
 
 class DefineAnimationCommand : public Command {
 public:
-    DefineAnimationCommand(std::string name, CommandPtr command) : _name(std::move(name)), _command(std::move(command)) {}
+    DefineAnimationCommand(std::string name, CommandPtr command) : _name(std::move(name)),
+                                                                   _command(std::move(command)) {}
 
     CommandCode GetCode() const override {
         return CommandCode::DEFINE_ANIMATION;
@@ -311,57 +330,6 @@ public:
 private:
     std::string _name;
     CommandPtr _command;
-};
-
-class CommandFactory {
-public:
-    static CommandPtr CreateClearCommand() {
-        return CommandPtr(new ClearCommand);
-    }
-
-    static CommandPtr CreateShowCommand() {
-        return CommandPtr(new ShowCommand);
-    }
-
-    static CommandPtr CreateColorCommand(uint8_t red, uint8_t green, uint8_t blue) {
-        return CommandPtr(new ColorCommand(red, green, blue));
-    }
-
-    static CommandPtr CreatePixelCommand(int16_t x, int16_t y) {
-        return CommandPtr(new PixelCommand(x, y));
-    }
-
-    static CommandPtr CreateRectangleCommand(int16_t x, int16_t y, uint16_t width, uint16_t height) {
-        return CommandPtr(new RectangleCommand(x, y, width, height));
-    }
-
-    static CommandPtr CreatePositionCommand(uint8_t position, uint8_t digit) {
-        return CommandPtr(new DigitCommand(position, digit));
-    }
-
-    static CommandPtr CreateSmallTextCommand(int16_t x, int16_t y, std::string text) {
-        return CommandPtr(new SmallTextCommand(x, y, text));
-    }
-
-    static CommandPtr CreateLargeTextCommand(int16_t x, int16_t y, std::string text) {
-        return CommandPtr(new LargeTextCommand(x, y, text));
-    }
-
-    static CommandPtr CreateDefineImageCommand(const std::string &name, boost::shared_ptr<const Image> image) {
-        return CommandPtr(new DefineImageCommand(name, image));
-    }
-
-    static CommandPtr CreateImageCommand(int16_t x, int16_t y, const std::string &name) {
-        return CommandPtr(new ImageCommand(x, y, name));
-    }
-
-    static CommandPtr CreateCompositeCommand(CommandVector commands) {
-        return CommandPtr(new CompositeCommand(commands));
-    }
-
-    static CommandPtr CreateDefineAnimationCommand(const std::string &name, CommandPtr command) {
-        return CommandPtr(new DefineAnimationCommand(name, command));
-    }
 };
 
 #endif //DISPLAYSERVER_COMMAND_H

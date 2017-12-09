@@ -18,7 +18,7 @@ Client::~Client() {
     _socket.close();
 }
 
-Client& Client::SendCommand(const boost::shared_ptr<const Command> &command) {
+Client& Client::SendCommand(const CommandPtr &command) {
     Packet packet(command);
 
     std::vector<boost::asio::mutable_buffer> bufs;

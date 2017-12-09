@@ -115,7 +115,7 @@ void LedMatrixDisplay::DrawLargeText(int16_t x, int16_t y, std::string text) {
 }
 
 void LedMatrixDisplay::DrawImage(int16_t x, int16_t y, const std::string &imageName) {
-    boost::shared_ptr<const Image> image = GetImage(imageName);
+    ImagePtr image = GetImage(imageName);
 
     if (image) {
         for (uint16_t i = 0; i < image->GetWidth(); i++) {

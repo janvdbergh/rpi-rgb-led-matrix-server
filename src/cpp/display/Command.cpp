@@ -50,6 +50,10 @@ void CompositeCommand::Visit(Display &display) const {
     }
 }
 
+void SleepCommand::Visit(Display &display) const {
+    display.Sleep(GetMillis());
+}
+
 void DefineAnimationCommand::Visit(Display &display) const {
     display.DefineAnimation(_name, _command);
 }

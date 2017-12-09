@@ -29,6 +29,7 @@ private:
 
     friend class ImageBuilder;
 };
+typedef boost::shared_ptr<Image> ImagePtr;
 
 class ImageBuilder {
 public:
@@ -36,7 +37,7 @@ public:
 
     void SetPixel(uint16_t x, uint16_t y, uint8_t red, uint8_t green, uint8_t blue);
 
-    boost::shared_ptr<const Image> Build() const {
+    ImagePtr Build() const {
         return _image;
     }
 

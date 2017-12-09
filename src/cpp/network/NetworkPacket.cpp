@@ -9,7 +9,7 @@ class PacketReader {
 public:
     explicit PacketReader(std::vector<char> data) : _data(std::move(data)), _position(0) {}
 
-    boost::shared_ptr<const Command> ReadCommand();
+    CommandPtr ReadCommand();
 
     void complete();
 
@@ -32,7 +32,7 @@ private:
 
     std::string ReadString();
 
-    boost::shared_ptr<const Image> ReadImage();
+    ImagePtr ReadImage();
 };
 
 class PacketWriter {
@@ -41,7 +41,7 @@ public:
 
     const std::vector<char> &GetData() { return _data; }
 
-    void Write(const boost::shared_ptr<const Command> &command);
+    void Write(const CommandPtr &command);
 
 private:
     std::vector<char> _data;
@@ -61,7 +61,7 @@ private:
 
     void Write(const std::string &string);
 
-    void Write(const boost::shared_ptr<const Image> &image);
+    void Write(const ImagePtr &image);
 };
 
 uint32_t Packet::GetCRC() const {
@@ -70,15 +70,15 @@ uint32_t Packet::GetCRC() const {
     return static_cast<uint32_t>(result.checksum());
 }
 
-Packet::Packet(const boost::shared_ptr<const Command> &command) {
+Packet::Packet(const CommandPtr &command) {
     PacketWriter writer;
     writer.Write(command);
     _data = writer.GetData();
 }
 
-boost::shared_ptr<const Command> Packet::GetCommand() const {
+CommandPtr Packet::GetCommand() const {
     PacketReader reader(_data);
-    boost::shared_ptr<const Command> result = reader.ReadCommand();
+    CommandPtr result = reader.ReadCommand();
     reader.complete();
 
     return result;
@@ -136,7 +136,7 @@ std::string PacketReader::ReadString() {
     return result;
 }
 
-boost::shared_ptr<const Image> PacketReader::ReadImage() {
+ImagePtr PacketReader::ReadImage() {
     uint16_t width = ReadUint16();
     uint16_t height = ReadUint16();
 
@@ -159,52 +159,55 @@ void PacketReader::complete() {
     }
 }
 
-boost::shared_ptr<const Command> PacketReader::ReadCommand() {
+CommandPtr PacketReader::ReadCommand() {
     CommandCode commandCode = ReadCommandCode();
     switch (commandCode) {
         case CommandCode::CLEAR:
-            return boost::shared_ptr<const Command>(new ClearCommand());
+            return CommandPtr(new ClearCommand());
 
         case CommandCode::SHOW:
-            return boost::shared_ptr<const Command>(new ShowCommand());
+            return CommandPtr(new ShowCommand());
 
         case CommandCode::COLOR:
-            return boost::shared_ptr<const Command>(new ColorCommand(ReadUint8(), ReadUint8(), ReadUint8()));
+            return CommandPtr(new ColorCommand(ReadUint8(), ReadUint8(), ReadUint8()));
 
         case CommandCode::PIXEL:
-            return boost::shared_ptr<const Command>(new PixelCommand(ReadInt16(), ReadInt16()));
+            return CommandPtr(new PixelCommand(ReadInt16(), ReadInt16()));
 
         case CommandCode::RECTANGLE:
-            return boost::shared_ptr<const Command>(
+            return CommandPtr(
                     new RectangleCommand(ReadInt16(), ReadInt16(), ReadUint16(), ReadUint16()));
 
         case CommandCode::DIGIT:
-            return boost::shared_ptr<const Command>(new DigitCommand(ReadUint8(), ReadUint8()));
+            return CommandPtr(new DigitCommand(ReadUint8(), ReadUint8()));
 
         case CommandCode::SMALL_TEXT:
-            return boost::shared_ptr<const Command>(new SmallTextCommand(ReadInt16(), ReadInt16(), ReadString()));
+            return CommandPtr(new SmallTextCommand(ReadInt16(), ReadInt16(), ReadString()));
 
         case CommandCode::LARGE_TEXT:
-            return boost::shared_ptr<const Command>(new LargeTextCommand(ReadInt16(), ReadInt16(), ReadString()));
+            return CommandPtr(new LargeTextCommand(ReadInt16(), ReadInt16(), ReadString()));
 
         case CommandCode::DEFINE_IMAGE:
-            return boost::shared_ptr<const Command>(new DefineImageCommand(ReadString(), ReadImage()));
+            return CommandPtr(new DefineImageCommand(ReadString(), ReadImage()));
 
         case CommandCode::DRAW_IMAGE:
-            return boost::shared_ptr<const Command>(new ImageCommand(ReadInt16(), ReadInt16(), ReadString()));
+            return CommandPtr(new ImageCommand(ReadInt16(), ReadInt16(), ReadString()));
 
         case CommandCode::COMPOSITE: {
             uint16_t numberOfCommands = ReadUint16();
-            std::vector<boost::shared_ptr<const Command>> commands(numberOfCommands);
+            std::vector<CommandPtr> commands(numberOfCommands);
             for (int i = 0; i < numberOfCommands; i++) {
                 commands.push_back(ReadCommand());
             }
 
-            return boost::shared_ptr<const Command>(new CompositeCommand(commands));
+            return CommandPtr(new CompositeCommand(commands));
         }
 
+        case CommandCode::SLEEP:
+            return CommandPtr(new SleepCommand(ReadUint16()));
+
         case CommandCode::DEFINE_ANIMATION:
-            return boost::shared_ptr<const Command>(new DefineAnimationCommand(ReadString(), ReadCommand()));
+            return CommandPtr(new DefineAnimationCommand(ReadString(), ReadCommand()));
 
         default:
             boost::throw_exception(UnknownCommandError(commandCode));
@@ -243,7 +246,7 @@ void PacketWriter::Write(int16_t int16) {
     Write((boost::endian::little_int16_at) int16);
 }
 
-void PacketWriter::Write(const boost::shared_ptr<const Image> &image) {
+void PacketWriter::Write(const ImagePtr &image) {
     Write(image->GetWidth());
     Write(image->GetHeight());
 
@@ -256,7 +259,7 @@ void PacketWriter::Write(const boost::shared_ptr<const Image> &image) {
     }
 }
 
-void PacketWriter::Write(const boost::shared_ptr<const Command> &command) {
+void PacketWriter::Write(const CommandPtr &command) {
     Write(command->GetCode());
 
     switch (command->GetCode()) {
@@ -334,6 +337,12 @@ void PacketWriter::Write(const boost::shared_ptr<const Command> &command) {
             for (auto &it : compositeCommand.GetCommands()) {
                 Write(it);
             }
+            break;
+        }
+
+        case CommandCode::SLEEP: {
+            auto &sleepCommand = (const SleepCommand&)*command;
+            Write(sleepCommand.GetMillis());
             break;
         }
 

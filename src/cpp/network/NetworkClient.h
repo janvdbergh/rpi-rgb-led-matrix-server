@@ -12,7 +12,7 @@ public:
 
     ~Client();
 
-    Client& SendCommand(const boost::shared_ptr<const Command> &command);
+    Client& SendCommand(const CommandPtr &command);
 
 private:
     boost::asio::ip::tcp::socket _socket;

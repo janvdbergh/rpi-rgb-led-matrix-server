@@ -13,16 +13,16 @@ int main(int argc, char *argv[]) {
     imageBuilder.SetPixel(1, 1, 10, 11, 12);
 
     CommandVector commands;
-    commands.emplace_back(CommandFactory::CreateClearCommand());
-    commands.emplace_back(CommandFactory::CreateColorCommand(128, 128, 128));
-    commands.emplace_back(CommandFactory::CreatePixelCommand(12, 12));
-    commands.emplace_back(CommandFactory::CreateImageCommand(5, 5, "test"));
-    commands.emplace_back(CommandFactory::CreateShowCommand());
-    CommandPtr composite = CommandFactory::CreateCompositeCommand(commands);
+    commands.emplace_back(CommandPtr(new ClearCommand()));
+    commands.emplace_back(CommandPtr(new ColorCommand(128, 128, 128)));
+    commands.emplace_back(CommandPtr(new PixelCommand(12, 12)));
+    commands.emplace_back(CommandPtr(new ImageCommand(5, 5, "test")));
+    commands.emplace_back(CommandPtr(new ShowCommand()));
+    CommandPtr composite = CommandPtr(new CompositeCommand(commands));
 
     client
-            .SendCommand(CommandFactory::CreateDefineImageCommand("test", imageBuilder.Build()))
-            .SendCommand(CommandFactory::CreateDefineAnimationCommand("animation", composite));
+            .SendCommand(CommandPtr(new DefineImageCommand("test", imageBuilder.Build())))
+            .SendCommand(CommandPtr(new DefineAnimationCommand("animation", composite)));
     sleep(3);
 
     return 0;
