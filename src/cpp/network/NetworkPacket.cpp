@@ -193,16 +193,18 @@ boost::shared_ptr<const Command> PacketReader::ReadCommand() {
         case CommandCode::DRAW_IMAGE:
             return boost::shared_ptr<const Command>(new ImageCommand(ReadInt16(), ReadInt16(), ReadString()));
 
-        case CommandCode::DEFINE_ANIMATION: {
-            std::string name = ReadString();
+        case CommandCode::COMPOSITE: {
             uint16_t numberOfCommands = ReadUint16();
             std::vector<boost::shared_ptr<const Command>> commands(numberOfCommands);
             for (int i = 0; i < numberOfCommands; i++) {
                 commands.push_back(ReadCommand());
             }
 
-            return boost::shared_ptr<const Command>(new DefineAnimationCommand(ReadString(), commands));
+            return boost::shared_ptr<const Command>(new CompositeCommand(commands));
         }
+
+        case CommandCode::DEFINE_ANIMATION:
+            return boost::shared_ptr<const Command>(new DefineAnimationCommand(ReadString(), ReadCommand()));
 
         default:
             boost::throw_exception(UnknownCommandError(commandCode));
@@ -326,13 +328,19 @@ void PacketWriter::Write(const boost::shared_ptr<const Command> &command) {
             break;
         }
 
+        case CommandCode::COMPOSITE: {
+            auto &compositeCommand = (const CompositeCommand &) *command;
+            Write((uint16_t) compositeCommand.GetCommands().size());
+            for (auto &it : compositeCommand.GetCommands()) {
+                Write(it);
+            }
+            break;
+        }
+
         case CommandCode::DEFINE_ANIMATION: {
             auto &defineAnimationCommand = (const DefineAnimationCommand &) *command;
             Write(defineAnimationCommand.GetName());
-            Write((uint16_t )defineAnimationCommand.GetCommands().size());
-            for (auto &it : defineAnimationCommand.GetCommands()) {
-                Write(it);
-            }
+            Write(defineAnimationCommand.GetCommand());
             break;
         }
 

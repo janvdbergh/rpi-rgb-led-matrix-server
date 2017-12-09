@@ -12,17 +12,17 @@ int main(int argc, char *argv[]) {
     imageBuilder.SetPixel(1, 0, 7, 8, 9);
     imageBuilder.SetPixel(1, 1, 10, 11, 12);
 
-    std::vector<boost::shared_ptr<const Command>> commands;
-    commands.push_back(boost::shared_ptr<const Command>(new ClearCommand));
-    commands.push_back(boost::shared_ptr<const Command>(new ColorCommand(128, 128, 128)));
-    commands.push_back(boost::shared_ptr<const Command>(new PixelCommand(12, 12)));
-    commands.push_back(boost::shared_ptr<const Command>(new ImageCommand(5, 5, "test")));
-    commands.push_back(boost::shared_ptr<const Command>(new ShowCommand()));
+    CommandVector commands;
+    commands.emplace_back(CommandFactory::CreateClearCommand());
+    commands.emplace_back(CommandFactory::CreateColorCommand(128, 128, 128));
+    commands.emplace_back(CommandFactory::CreatePixelCommand(12, 12));
+    commands.emplace_back(CommandFactory::CreateImageCommand(5, 5, "test"));
+    commands.emplace_back(CommandFactory::CreateShowCommand());
+    CommandPtr composite = CommandFactory::CreateCompositeCommand(commands);
 
     client
-            .SendCommand(boost::shared_ptr<const Command>(new DefineImageCommand("test", imageBuilder.Build())))
-            .SendCommand(boost::shared_ptr<const Command>(new DefineAnimationCommand("animation", commands)));
-
+            .SendCommand(CommandFactory::CreateDefineImageCommand("test", imageBuilder.Build()))
+            .SendCommand(CommandFactory::CreateDefineAnimationCommand("animation", composite));
     sleep(3);
 
     return 0;

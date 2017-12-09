@@ -11,7 +11,7 @@ public:
     virtual ~Display() = default;
 
     void ExecuteCommand(const boost::shared_ptr<const Command> &command) {
-        command->visit(*this);
+        command->Visit(*this);
     }
 
     virtual bool Initialize(int argc, char **argv) =0;
@@ -36,7 +36,7 @@ public:
 
     virtual void Show() =0;
 
-    virtual void DefineAnimation(const std::string &name, const std::vector<boost::shared_ptr<const Command>> &commands);
+    virtual void DefineAnimation(const std::string &name, const boost::shared_ptr<const Command> &command);
 
 protected:
     boost::shared_ptr<const Image> GetImage(const std::string &name) const {
@@ -45,7 +45,7 @@ protected:
 
 private:
     std::map<std::string, boost::shared_ptr<const Image>> _images;
-    std::map<std::string, std::vector<boost::shared_ptr<const Command>>> _commands;
+    std::map<std::string, boost::shared_ptr<const Command>> _command;
 };
 
 boost::shared_ptr<Display> CreateDisplay();
