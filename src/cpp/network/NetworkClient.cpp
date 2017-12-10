@@ -1,7 +1,3 @@
-//
-// Created by Jan Van den Bergh on 12/11/2017.
-//
-
 #include "NetworkClient.h"
 #include "NetworkError.h"
 
@@ -18,60 +14,9 @@ Client::~Client() {
     _socket.close();
 }
 
-Client & Client::SetColor(uint8_t r, uint8_t g, uint8_t b) {
-    WritePacket(PacketWriter() << COLOR << r << g << b);
-    return *this;
-}
+Client& Client::SendCommand(const CommandPtr &command) {
+    Packet packet(command);
 
-Client &Client::Clear() {
-    WritePacket(PacketWriter() << CLEAR);
-    return *this;
-}
-
-Client &Client::DrawPixel(int16_t x, int16_t y) {
-    WritePacket(PacketWriter() << PIXEL << x << y);
-    return *this;
-}
-
-Client &Client::DrawRectangle(int16_t x, int16_t y, int16_t width, int16_t height) {
-    WritePacket(PacketWriter() << RECTANGLE << x << y << width << height);
-    return *this;
-}
-
-Client &Client::DrawDigit(uint8_t position, uint8_t digit) {
-    WritePacket(PacketWriter() << DIGIT << position << digit);
-    return *this;
-}
-
-Client &Client::DrawSmallText(int16_t x, int16_t y, const std::string &text) {
-    WritePacket(PacketWriter() << SMALL_TEXT << x << y << text);
-    return *this;
-}
-
-Client &Client::DrawLargeText(int16_t x, int16_t y, const std::string &text) {
-    WritePacket(PacketWriter() << LARGE_TEXT << x << y << text);
-    return *this;
-}
-
-Client &Client::DefineImage(const std::string &name, boost::shared_ptr<const Image> image) {
-    WritePacket(PacketWriter() << DEFINE_IMAGE << name << image);
-
-    return *this;
-}
-
-Client &Client::DrawImage(int16_t x, int16_t y, const std::string &name) {
-    WritePacket(PacketWriter() << DRAW_IMAGE << x << y << name);
-
-
-    return *this;
-}
-
-Client &Client::Show() {
-    WritePacket(PacketWriter() << SHOW);
-    return *this;
-}
-
-void Client::WritePacket(const Packet &packet) {
     std::vector<boost::asio::mutable_buffer> bufs;
     boost::system::error_code error;
 
@@ -88,5 +33,7 @@ void Client::WritePacket(const Packet &packet) {
     if (error) {
         boost::throw_exception(WriteError());
     }
+
+    return *this;
 }
 

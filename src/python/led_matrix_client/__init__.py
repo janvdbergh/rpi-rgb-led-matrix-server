@@ -1,3 +1,5 @@
-from . import NetworkClient as nc
+from . import NetworkClient as networkClientModule
+from . import Command as commandModule
 
-NetworkClient = nc.NetworkClient
+Command = commandModule.Command
+NetworkClient = networkClientModule.NetworkClient

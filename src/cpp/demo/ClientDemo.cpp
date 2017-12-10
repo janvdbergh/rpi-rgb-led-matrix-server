@@ -12,15 +12,20 @@ int main(int argc, char *argv[]) {
     imageBuilder.SetPixel(1, 0, 7, 8, 9);
     imageBuilder.SetPixel(1, 1, 10, 11, 12);
 
-    client
-            .DefineImage("test", imageBuilder.Build())
-            .Clear()
-            .SetColor(128, 128, 128)
-            .DrawPixel(12, 12)
-            .DrawImage(5, 5, "test")
-            .Show();
+    CommandVector commands;
+    commands.emplace_back(CommandPtr(new ClearCommand()));
+    commands.emplace_back(CommandPtr(new ColorCommand(128, 128, 128)));
+    commands.emplace_back(CommandPtr(new PixelCommand(12, 12)));
+    commands.emplace_back(CommandPtr(new SmallTextCommand(5, 25, "test")));
+    commands.emplace_back(CommandPtr(new ImageCommand(5, 5, "test")));
+    commands.emplace_back(CommandPtr(new ShowCommand()));
+    CommandPtr composite = CommandPtr(new CompositeCommand(commands));
 
-    sleep(8);
+    client
+            .SendCommand(CommandPtr(new DefineImageCommand("test", imageBuilder.Build())))
+            .SendCommand(CommandPtr(new DefineAnimationCommand("animation", composite)))
+            .SendCommand(CommandPtr(new AnimationCommand("animation")));
+    sleep(3);
 
     return 0;
 }

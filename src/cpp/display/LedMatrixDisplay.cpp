@@ -55,7 +55,7 @@ void LedMatrixDisplay::DrawPixel(int16_t x, int16_t y) {
     _frameCanvas->SetPixel(x, y, _color.r, _color.g, _color.b);
 }
 
-void LedMatrixDisplay::DrawRectangle(int16_t x, int16_t y, int16_t width, int16_t height) {
+void LedMatrixDisplay::DrawRectangle(int16_t x, int16_t y, uint16_t width, uint16_t height) {
     for (int i = 0; i < width; i++) {
         for (int j = 0; j < height; j++) {
             _frameCanvas->SetPixel(x + i, y + j, _color.r, _color.g, _color.b);
@@ -115,7 +115,7 @@ void LedMatrixDisplay::DrawLargeText(int16_t x, int16_t y, std::string text) {
 }
 
 void LedMatrixDisplay::DrawImage(int16_t x, int16_t y, const std::string &imageName) {
-    boost::shared_ptr<const Image> image = GetImage(imageName);
+    ImagePtr image = GetImage(imageName);
 
     if (image) {
         for (uint16_t i = 0; i < image->GetWidth(); i++) {
