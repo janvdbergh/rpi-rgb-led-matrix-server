@@ -1,5 +1,5 @@
 #include <sstream>
-#include "NetworkError.h"
+#include "ServerError.h"
 
 std::string GetUnknownCommandMessage(boost::endian::little_uint16_at command) {
 	std::ostringstream stringStream;
@@ -14,7 +14,7 @@ std::string GetInvalidSizeMessage(size_t expectedSize, size_t actualSize) {
 }
 
 UnknownCommandError::UnknownCommandError(boost::endian::little_uint16_at command) :
-		NetworkError(GetUnknownCommandMessage(command)) {}
+		ServerError(GetUnknownCommandMessage(command)) {}
 
 InvalidSizeError::InvalidSizeError(size_t expectedSize, size_t actualSize) :
-		NetworkError(GetInvalidSizeMessage(expectedSize, actualSize)) {}
+		ServerError(GetInvalidSizeMessage(expectedSize, actualSize)) {}

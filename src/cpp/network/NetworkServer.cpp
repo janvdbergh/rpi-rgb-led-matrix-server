@@ -6,7 +6,7 @@
 #include <boost/endian/arithmetic.hpp>
 #include <boost/crc.hpp>
 
-#include "NetworkError.h"
+#include "ServerError.h"
 #include "NetworkServer.h"
 
 using boost::asio::ip::tcp;
@@ -41,7 +41,7 @@ void Server::HandleClientConnection(tcp::socket &socket) {
 
 			HandlePacket(packet);
 		}
-	} catch (NetworkError &e) {
+	} catch (ServerError &e) {
 		std::cerr << "Error: " << e.what() << std::endl;
 	}
 

@@ -10,20 +10,20 @@ link_directories(${RPI_RGB_LED_MATRIX_DIR}/lib)
 # Led matrix display
 add_executable(DisplayServerLed
         network/ServerMain.cpp
-        network/NetworkError.cpp
+        network/ServerError.cpp
         network/NetworkPacket.cpp
         network/NetworkServer.cpp
         display/Image.cpp
         display/Command.cpp
         display/Display.cpp
         display/LedMatrixDisplay.cpp
-        network/NetworkError.h)
+        network/ServerError.h)
 target_link_libraries(DisplayServerLed rgbmatrix ${Boost_LIBRARIES} pthread)
 
 # Mock display
 add_executable(DisplayServerMock
         network/ServerMain.cpp
-        network/NetworkError.cpp
+        network/ServerError.cpp
         network/NetworkPacket.cpp
         network/NetworkServer.cpp
         display/Image.cpp
@@ -38,7 +38,7 @@ add_library(NetworkClient SHARED
         display/Image.cpp
         display/Display.cpp
         network/NetworkPacket.cpp
-        network/NetworkError.cpp
+        network/ServerError.cpp
         network/NetworkClient.cpp
         )
 target_link_libraries(NetworkClient ${Boost_LIBRARIES})

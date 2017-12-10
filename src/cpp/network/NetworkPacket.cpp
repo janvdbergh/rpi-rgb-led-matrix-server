@@ -2,7 +2,7 @@
 #include <boost/asio.hpp>
 #include <iostream>
 #include <boost/crc.hpp>
-#include "NetworkError.h"
+#include "ServerError.h"
 #include "NetworkPacket.h"
 
 class PacketReader {

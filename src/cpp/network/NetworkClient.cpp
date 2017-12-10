@@ -1,5 +1,5 @@
 #include "NetworkClient.h"
-#include "NetworkError.h"
+#include "ServerError.h"
 
 using boost::asio::ip::tcp;
 
