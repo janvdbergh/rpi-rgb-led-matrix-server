@@ -1,7 +1,3 @@
-//
-// Created by Jan Van den Bergh on 06/12/2017.
-//
-
 #include "Display.h"
 
 void ClearCommand::Visit(Display &display) const {

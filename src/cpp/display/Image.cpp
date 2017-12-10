@@ -1,7 +1,3 @@
-//
-// Created by Jan Van den Bergh on 03/12/2017.
-//
-
 #include "Image.h"
 
 Image::Image(uint16_t width, uint16_t height) : _width(width), _height(height) {

@@ -1,7 +1,3 @@
-//
-// Created by Jan Van den Bergh on 12/11/2017.
-//
-
 #include "NetworkClient.h"
 #include "NetworkError.h"
 
