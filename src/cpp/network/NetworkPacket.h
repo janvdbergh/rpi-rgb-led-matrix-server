@@ -10,18 +10,20 @@ const uint32_t MAX_PACKET_SIZE = 8192;
 
 class Packet {
 public:
-    explicit Packet(const CommandPtr& command);
-    explicit Packet(std::vector<char> data): _data(std::move(data)) {}
+	explicit Packet(const CommandPtr &command);
 
-    uint32_t GetSize() const { return static_cast<uint32_t>(_data.size()); }
+	explicit Packet(std::vector<char> data) : _data(std::move(data)) {}
 
-    const std::vector<char> &GetData() const { return _data; }
+	uint32_t GetSize() const { return static_cast<uint32_t>(_data.size()); }
 
-    uint32_t GetCRC() const;
+	const std::vector<char> &GetData() const { return _data; }
 
-    CommandPtr GetCommand() const;
+	uint32_t GetCRC() const;
+
+	CommandPtr GetCommand() const;
+
 private:
-    std::vector<char> _data;
+	std::vector<char> _data;
 };
 
 #endif //DISPLAYSERVER_PACKET_H

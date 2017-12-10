@@ -8,14 +8,14 @@
 
 class Client {
 public:
-    Client(boost::asio::io_service& io_service, const std::string& host, uint16_t port);
+	Client(boost::asio::io_service &io_service, const std::string &host, uint16_t port);
 
-    ~Client();
+	~Client();
 
-    Client& SendCommand(const CommandPtr &command);
+	Client &SendCommand(const CommandPtr &command);
 
 private:
-    boost::asio::ip::tcp::socket _socket;
+	boost::asio::ip::tcp::socket _socket;
 
 };
 

@@ -8,21 +8,21 @@
 
 class Server {
 public:
-    Server(boost::shared_ptr<Display> &display, uint16_t port) : _display(display), _port(port) {}
+	Server(boost::shared_ptr<Display> &display, uint16_t port) : _display(display), _port(port) {}
 
-    void StartServerAndBlock();
+	void StartServerAndBlock();
 
 private:
-    boost::shared_ptr<Display> _display;
-    uint16_t _port;
+	boost::shared_ptr<Display> _display;
+	uint16_t _port;
 
-    void HandleClientConnection(boost::asio::ip::tcp::socket &socket);
+	void HandleClientConnection(boost::asio::ip::tcp::socket &socket);
 
-    uint32_t ReadDataLength(boost::asio::ip::tcp::socket &socket);
+	uint32_t ReadDataLength(boost::asio::ip::tcp::socket &socket);
 
-    Packet ReadData(boost::asio::ip::tcp::socket &socket, uint32_t data_length);
+	Packet ReadData(boost::asio::ip::tcp::socket &socket, uint32_t data_length);
 
-    void HandlePacket(Packet packet);
+	void HandlePacket(Packet packet);
 };
 
 #endif //DISPLAYSERVER_NETWORK_SERVER_H
