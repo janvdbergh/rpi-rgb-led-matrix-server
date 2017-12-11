@@ -12,7 +12,7 @@ using boost::asio::ip::tcp;
 void Server::StartServerAndBlock() {
 	try {
 		boost::asio::io_service io_service;
-		tcp::acceptor acceptor(io_service, tcp::endpoint(tcp::v4(), _port));
+		tcp::acceptor acceptor(io_service, tcp::endpoint(boost::asio::ip::address::from_string("127.0.0.1"), _port));
 
 		std::cout << "Opening server on port " << _port << std::endl;
 
