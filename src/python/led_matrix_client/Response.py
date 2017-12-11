@@ -15,7 +15,7 @@ class ResponseCode(Enum):
 
 class Response:
 	def __init__(self, responseData):
-		if (Util.from16BitUnsigned(responseData, 0) != 0xE0):
+		if (Util.from16BitSigned(responseData, 0) != 0xE0):
 			raise Exception("Invalid packet type")
 		self.responseCode = Util.from16BitUnsigned(responseData, 2)
 		self.message = Util.fromString(responseData, 4)
