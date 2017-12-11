@@ -11,4 +11,5 @@ install(
 install(
 		FILES scripts/rpi-rgb-led-matrix-server
 		DESTINATION /etc/init.d
+		PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ
 )
