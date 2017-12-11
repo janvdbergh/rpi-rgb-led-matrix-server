@@ -5,6 +5,7 @@ void Display::Reset() {
 	_images.clear();
 	_animations.clear();
 	Clear();
+	Show();
 }
 
 void Display::DefineImage(const std::string &name, const ImagePtr &image) {
