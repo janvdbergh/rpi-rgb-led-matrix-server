@@ -9,7 +9,7 @@ class DisplayError : public std::exception {
 public:
 	explicit DisplayError(ResponseCode responseCode, std::string message) : _responseCode(responseCode), _message(std::move(message)) {}
 
-	const char *what() const _NOEXCEPT override { return _message.c_str(); }
+	const char *what() const noexcept override { return _message.c_str(); }
 	const ResponseCode responseCode() const { return _responseCode; }
 
 private:
