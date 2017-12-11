@@ -55,7 +55,3 @@ install(
 		TARGETS DisplayServerLed
 		DESTINATION rpi-rgb-led-matrix-server/bin
 )
-install(
-		FILES fonts/*
-		DESTINATION rpi-rgb-led-matrix-server/bin/fonts
-)
