@@ -67,7 +67,7 @@ private:
 
 	void Write(const CommandCode &commandCode) { Write((uint16_t) commandCode); }
 
-	void Write(const ResponseCode &responseCode) { Write((uint16_t) responseCode); }
+	void Write(const ResponseCode &responseCode) { Write((int16_t) responseCode); }
 
 	void Write(uint8_t uint8) { Write((boost::endian::little_uint8_at) uint8); }
 
