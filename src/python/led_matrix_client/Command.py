@@ -91,4 +91,4 @@ class Command:
 		return Command(Util.to16BitUnsigned(CommandCode.DEFINE_ANIMATION.value) + Util.toString(name) + command.data)
 
 	def __init__(self, data):
-		self.data = data
+		self.data = Util.to16BitUnsigned(0xC0) + data
