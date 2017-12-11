@@ -10,6 +10,8 @@ class Display {
 public:
 	virtual ~Display() = default;
 
+	virtual void Reset();
+
 	void ExecuteCommand(const CommandPtr &command) {
 		command->Visit(*this);
 	}

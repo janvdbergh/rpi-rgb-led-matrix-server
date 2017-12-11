@@ -20,7 +20,8 @@ void Server::StartServerAndBlock() {
 			tcp::socket socket(io_service);
 			acceptor.accept(socket);
 
-			this->HandleClientConnection(socket);
+			HandleClientConnection(socket);
+			_display->Reset();
 		}
 	} catch (std::exception &e) {
 		std::cerr << "TCP server error: " << e.what() << std::endl;

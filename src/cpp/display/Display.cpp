@@ -1,6 +1,12 @@
 #include "Display.h"
 #include "DisplayError.h"
 
+void Display::Reset() {
+	_images.clear();
+	_animations.clear();
+	Clear();
+}
+
 void Display::DefineImage(const std::string &name, const ImagePtr &image) {
 	_images[name] = image;
 }
