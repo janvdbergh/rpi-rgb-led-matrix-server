@@ -1,5 +1,5 @@
 #include "NetworkClient.h"
-#include "ServerError.h"
+#include "../display/DisplayError.h"
 
 using boost::asio::ip::tcp;
 
@@ -15,25 +15,13 @@ Client::~Client() {
 }
 
 Client &Client::SendCommand(const CommandPtr &command) {
-	Packet packet(command);
+	Packet(command).Send(_socket);
 
-	std::vector<boost::asio::mutable_buffer> bufs;
-	boost::system::error_code error;
-
-	uint32_t size = packet.GetSize();
-	std::vector<char> data = packet.GetData();
-	uint32_t crc = packet.GetCRC();
-
-	bufs.push_back(boost::asio::buffer(&size, sizeof(size)));
-	bufs.push_back(boost::asio::buffer(data.data(), size));
-	bufs.push_back(boost::asio::buffer(&crc, sizeof(crc)));
-
-	boost::asio::write(_socket, bufs, error);
-
-	if (error) {
-		boost::throw_exception(WriteError());
+	Packet responsePacket(_socket);
+	ResponsePtr response = responsePacket.GetResponse();
+	if (response->IsError()) {
+		boost::throw_exception(DisplayError(response->GetResponseCode(), response->GetDetailMessage()));
 	}
 
 	return *this;
 }
-

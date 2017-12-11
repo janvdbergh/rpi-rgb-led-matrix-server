@@ -1,5 +1,5 @@
 #include <sstream>
-#include "ServerError.h"
+#include "DisplayError.h"
 
 std::string GetUnknownCommandMessage(boost::endian::little_uint16_at command) {
 	std::ostringstream stringStream;
@@ -12,9 +12,3 @@ std::string GetInvalidSizeMessage(size_t expectedSize, size_t actualSize) {
 	stringStream << "Invalid packet size. Expected " << expectedSize << ", but got " << actualSize;
 	return stringStream.str();
 }
-
-UnknownCommandError::UnknownCommandError(boost::endian::little_uint16_at command) :
-		ServerError(GetUnknownCommandMessage(command)) {}
-
-InvalidSizeError::InvalidSizeError(size_t expectedSize, size_t actualSize) :
-		ServerError(GetInvalidSizeMessage(expectedSize, actualSize)) {}

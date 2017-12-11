@@ -117,11 +117,9 @@ void LedMatrixDisplay::DrawLargeText(int16_t x, int16_t y, std::string text) {
 void LedMatrixDisplay::DrawImage(int16_t x, int16_t y, const std::string &imageName) {
 	ImagePtr image = GetImage(imageName);
 
-	if (image) {
-		for (uint16_t i = 0; i < image->GetWidth(); i++) {
-			for (uint16_t j = 0; j < image->GetHeight(); j++) {
-				_frameCanvas->SetPixel(x + i, y + j, image->GetRed(i, j), image->GetGreen(i, j), image->GetBlue(i, j));
-			}
+	for (uint16_t i = 0; i < image->GetWidth(); i++) {
+		for (uint16_t j = 0; j < image->GetHeight(); j++) {
+			_frameCanvas->SetPixel(x + i, y + j, image->GetRed(i, j), image->GetGreen(i, j), image->GetBlue(i, j));
 		}
 	}
 }

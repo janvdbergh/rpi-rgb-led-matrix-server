@@ -1,4 +1,5 @@
 #include "Display.h"
+#include "DisplayError.h"
 
 void Display::DefineImage(const std::string &name, const ImagePtr &image) {
 	_images[name] = image;
@@ -6,11 +7,11 @@ void Display::DefineImage(const std::string &name, const ImagePtr &image) {
 
 const ImagePtr Display::GetImage(const std::string &name) const {
 	auto iterator = _images.find(name);
-	if (iterator != _images.end()) {
-		return iterator->second;
+	if (iterator == _images.end()) {
+		boost::throw_exception(DisplayError(UNKNOWN_IMAGE, "Unknown image"));
 	}
 
-	return nullptr;
+	return iterator->second;
 }
 
 void Display::DefineAnimation(const std::string &name, const CommandPtr &command) {
@@ -19,11 +20,11 @@ void Display::DefineAnimation(const std::string &name, const CommandPtr &command
 
 const CommandPtr Display::GetAnimation(const std::string &name) const {
 	auto iterator = _animations.find(name);
-	if (iterator != _animations.end()) {
-		return iterator->second;
+	if (iterator == _animations.end()) {
+		boost::throw_exception(DisplayError(UNKNOWN_ANIMATION, "Unknown animation"));
 	}
 
-	return nullptr;
+	return iterator->second;
 }
 
 void Display::Sleep(uint16_t millis) {
@@ -32,7 +33,5 @@ void Display::Sleep(uint16_t millis) {
 
 void Display::ShowAnimation(const std::string &name) {
 	CommandPtr command = GetAnimation(name);
-	if (command) {
-		this->ExecuteCommand(command);
-	}
+	this->ExecuteCommand(command);
 }

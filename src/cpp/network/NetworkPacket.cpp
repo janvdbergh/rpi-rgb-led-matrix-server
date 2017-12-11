@@ -2,14 +2,20 @@
 #include <boost/asio.hpp>
 #include <iostream>
 #include <boost/crc.hpp>
-#include "ServerError.h"
+#include "../display/DisplayError.h"
 #include "NetworkPacket.h"
+
+enum PacketType {
+	COMMAND = 0xC0, RESPONSE = 0xE0
+};
 
 class PacketReader {
 public:
 	explicit PacketReader(std::vector<char> data) : _data(std::move(data)), _position(0) {}
 
 	CommandPtr ReadCommand();
+
+	ResponsePtr ReadResponse();
 
 	void complete();
 
@@ -22,7 +28,11 @@ private:
 
 	void Read(void *dataHolder, size_t size);
 
+	PacketType ReadPacketType();
+
 	CommandCode ReadCommandCode();
+
+	ResponseCode ReadResponseCode();
 
 	uint8_t ReadUint8();
 
@@ -43,6 +53,8 @@ public:
 
 	void Write(const CommandPtr &command);
 
+	void Write(const ResponsePtr &response);
+
 private:
 	std::vector<char> _data;
 
@@ -51,18 +63,64 @@ private:
 
 	void Write(const void *data, size_t size);
 
-	void Write(const CommandCode &commandCode);
+	void Write(const PacketType &packetType) { Write((uint16_t) packetType); }
 
-	void Write(uint8_t uint8);
+	void Write(const CommandCode &commandCode) { Write((uint16_t) commandCode); }
 
-	void Write(uint16_t uint16);
+	void Write(const ResponseCode &responseCode) { Write((uint16_t) responseCode); }
 
-	void Write(int16_t int16);
+	void Write(uint8_t uint8) { Write((boost::endian::little_uint8_at) uint8); }
+
+	void Write(uint16_t uint16) { Write((boost::endian::little_uint16_at) uint16); }
+
+	void Write(int16_t int16) { Write((boost::endian::little_int16_at) int16); }
 
 	void Write(const std::string &string);
 
 	void Write(const ImagePtr &image);
 };
+
+static std::string GetUnknownCommandMessage(boost::endian::little_uint16_at command) {
+	std::ostringstream stringStream;
+	stringStream << "Unknown command " << command;
+	return stringStream.str();
+}
+
+static std::string GetInvalidSizeMessage(size_t expectedSize, size_t actualSize) {
+	std::ostringstream stringStream;
+	stringStream << "Invalid packet size. Expected " << expectedSize << ", but got " << actualSize;
+	return stringStream.str();
+}
+
+Packet::Packet(boost::asio::ip::tcp::socket &socket) {
+	std::vector<boost::asio::mutable_buffer> bufs;
+	boost::system::error_code error;
+
+	u_int32_t data_length;
+	bufs.push_back(boost::asio::buffer(&data_length, sizeof(data_length)));
+	boost::asio::read(socket, bufs, error);
+	if (error) {
+		boost::throw_exception(DisplayError(NETWORK_ERROR, "Read error"));
+	}
+	if (data_length > MAX_PACKET_SIZE) {
+		boost::throw_exception(DisplayError(MESSAGE_ERROR, "Packet too large"));
+	}
+
+	std::vector<char> data(data_length);
+	uint32_t expectedCrc;
+	bufs.clear();
+	bufs.push_back(boost::asio::buffer(&data.front(), data_length));
+	bufs.push_back(boost::asio::buffer(&expectedCrc, sizeof(expectedCrc)));
+	boost::asio::read(socket, bufs, error);
+	if (error) {
+		boost::throw_exception(DisplayError(NETWORK_ERROR, "Read error"));
+	}
+
+	_data = data;
+	if (GetCRC() != expectedCrc) {
+		boost::throw_exception(DisplayError(CRC_ERROR, "CRC error"));
+	}
+}
 
 uint32_t Packet::GetCRC() const {
 	boost::crc_32_type result;
@@ -76,12 +134,45 @@ Packet::Packet(const CommandPtr &command) {
 	_data = writer.GetData();
 }
 
+Packet::Packet(const ResponsePtr &response) {
+	PacketWriter writer;
+	writer.Write(response);
+	_data = writer.GetData();
+}
+
 CommandPtr Packet::GetCommand() const {
 	PacketReader reader(_data);
 	CommandPtr result = reader.ReadCommand();
 	reader.complete();
 
 	return result;
+}
+
+ResponsePtr Packet::GetResponse() const {
+	PacketReader reader(_data);
+	ResponsePtr result = reader.ReadResponse();
+	reader.complete();
+
+	return result;
+}
+
+void Packet::Send(boost::asio::ip::tcp::socket &socket) {
+	std::vector<boost::asio::mutable_buffer> bufs;
+	boost::system::error_code error;
+
+	uint32_t size = GetSize();
+	std::vector<char> data = GetData();
+	uint32_t crc = GetCRC();
+
+	bufs.push_back(boost::asio::buffer(&size, sizeof(size)));
+	bufs.push_back(boost::asio::buffer(data.data(), size));
+	bufs.push_back(boost::asio::buffer(&crc, sizeof(crc)));
+
+	boost::asio::write(socket, bufs, error);
+
+	if (error) {
+		boost::throw_exception(DisplayError(NETWORK_ERROR, "Read error"));
+	}
 }
 
 template<typename T>
@@ -92,7 +183,7 @@ void PacketReader::Read(T &resultHolder) {
 void PacketReader::Read(void *dataHolder, size_t size) {
 	size_t lastIndex = _position + size;
 	if (lastIndex > _data.size()) {
-		boost::throw_exception(IndexOutOfRangeError());
+		boost::throw_exception(DisplayError(MESSAGE_ERROR, "Index out of range"));
 	}
 
 	memcpy(dataHolder, &_data.front() + _position, size);
@@ -103,6 +194,18 @@ CommandCode PacketReader::ReadCommandCode() {
 	boost::endian::little_uint16_at result;
 	Read(result);
 	return (CommandCode) (int) result;
+}
+
+ResponseCode PacketReader::ReadResponseCode() {
+	boost::endian::little_uint16_at result;
+	Read(result);
+	return (ResponseCode) (int) result;
+}
+
+PacketType PacketReader::ReadPacketType() {
+	boost::endian::little_uint16_at result;
+	Read(result);
+	return (PacketType) (int) result;
 }
 
 uint8_t PacketReader::ReadUint8() {
@@ -155,11 +258,16 @@ ImagePtr PacketReader::ReadImage() {
 
 void PacketReader::complete() {
 	if (_data.size() != _position) {
-		boost::throw_exception(InvalidSizeError(_position, _data.size()));
+		boost::throw_exception(DisplayError(MESSAGE_ERROR, GetInvalidSizeMessage(_position, _data.size())));
 	}
 }
 
 CommandPtr PacketReader::ReadCommand() {
+	PacketType packetType = ReadPacketType();
+	if (packetType != PacketType::COMMAND) {
+		boost::throw_exception(DisplayError(MESSAGE_ERROR, "Invalid packet type"));
+	}
+
 	CommandCode commandCode = ReadCommandCode();
 	switch (commandCode) {
 		case CommandCode::CLEAR:
@@ -213,8 +321,17 @@ CommandPtr PacketReader::ReadCommand() {
 			return CommandPtr(new DefineAnimationCommand(ReadString(), ReadCommand()));
 
 		default:
-			boost::throw_exception(UnknownCommandError(commandCode));
+			boost::throw_exception(DisplayError(UNKNOWN_COMMAND, GetUnknownCommandMessage(commandCode)));
 	}
+}
+
+ResponsePtr PacketReader::ReadResponse() {
+	PacketType packetType = ReadPacketType();
+	if (packetType != PacketType::RESPONSE) {
+		boost::throw_exception(DisplayError(MESSAGE_ERROR, "Invalid packet type"));
+	}
+
+	return ResponsePtr(new Response(ReadResponseCode(), ReadString()));
 }
 
 template<typename T>
@@ -233,22 +350,6 @@ void PacketWriter::Write(const std::string &string) {
 	Write(string.c_str(), string.length());
 }
 
-void PacketWriter::Write(const CommandCode &commandCode) {
-	Write((uint16_t) commandCode);
-}
-
-void PacketWriter::Write(uint8_t uint8) {
-	Write((boost::endian::little_uint8_at) uint8);
-}
-
-void PacketWriter::Write(uint16_t uint16) {
-	Write((boost::endian::little_uint16_at) uint16);
-}
-
-void PacketWriter::Write(int16_t int16) {
-	Write((boost::endian::little_int16_at) int16);
-}
-
 void PacketWriter::Write(const ImagePtr &image) {
 	Write(image->GetWidth());
 	Write(image->GetHeight());
@@ -263,6 +364,7 @@ void PacketWriter::Write(const ImagePtr &image) {
 }
 
 void PacketWriter::Write(const CommandPtr &command) {
+	Write((uint16_t) PacketType::COMMAND);
 	Write(command->GetCode());
 
 	switch (command->GetCode()) {
@@ -363,6 +465,12 @@ void PacketWriter::Write(const CommandPtr &command) {
 		}
 
 		default:
-			boost::throw_exception(UnknownCommandError(command->GetCode()));
+			boost::throw_exception(DisplayError(UNKNOWN_COMMAND, GetUnknownCommandMessage(command->GetCode())));
 	}
+}
+
+void PacketWriter::Write(const ResponsePtr &response) {
+	Write(PacketType::RESPONSE);
+	Write(response->GetResponseCode());
+	Write(response->GetDetailMessage());
 }
