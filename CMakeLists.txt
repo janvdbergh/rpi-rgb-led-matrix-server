@@ -9,6 +9,6 @@ install(
 		DESTINATION rpi-rgb-led-matrix-server/bin/fonts
 )
 install(
-		FILES scripts/rpi-rgb-led-matrix-server.sh
+		FILES scripts/rpi-rgb-led-matrix-server
 		DESTINATION /etc/init.d
 )
