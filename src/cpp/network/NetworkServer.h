@@ -18,11 +18,7 @@ private:
 
 	void HandleClientConnection(boost::asio::ip::tcp::socket &socket);
 
-	uint32_t ReadDataLength(boost::asio::ip::tcp::socket &socket);
-
-	Packet ReadData(boost::asio::ip::tcp::socket &socket, uint32_t data_length);
-
-	void HandlePacket(Packet packet);
+	void HandlePacket(const Packet &packet);
 };
 
 #endif //DISPLAYSERVER_NETWORK_SERVER_H

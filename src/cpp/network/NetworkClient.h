@@ -16,7 +16,6 @@ public:
 
 private:
 	boost::asio::ip::tcp::socket _socket;
-
 };
 
 

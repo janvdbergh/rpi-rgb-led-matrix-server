@@ -3,10 +3,8 @@
 #include <cstring>
 #include <iostream>
 #include <regex>
-#include <boost/endian/arithmetic.hpp>
-#include <boost/crc.hpp>
 
-#include "NetworkError.h"
+#include "../display/DisplayError.h"
 #include "NetworkServer.h"
 
 using boost::asio::ip::tcp;
@@ -14,7 +12,7 @@ using boost::asio::ip::tcp;
 void Server::StartServerAndBlock() {
 	try {
 		boost::asio::io_service io_service;
-		tcp::acceptor acceptor(io_service, tcp::endpoint(tcp::v4(), _port));
+		tcp::acceptor acceptor(io_service, tcp::endpoint(boost::asio::ip::address::from_string("127.0.0.1"), _port));
 
 		std::cout << "Opening server on port " << _port << std::endl;
 
@@ -22,7 +20,8 @@ void Server::StartServerAndBlock() {
 			tcp::socket socket(io_service);
 			acceptor.accept(socket);
 
-			this->HandleClientConnection(socket);
+			HandleClientConnection(socket);
+			_display->Reset();
 		}
 	} catch (std::exception &e) {
 		std::cerr << "TCP server error: " << e.what() << std::endl;
@@ -36,59 +35,28 @@ void Server::HandleClientConnection(tcp::socket &socket) {
 
 	try {
 		while (socket.is_open()) {
-			uint32_t size = ReadDataLength(socket);
-			Packet packet = ReadData(socket, size);
+			Packet commandPacket(socket);
+			HandlePacket(commandPacket);
 
-			HandlePacket(packet);
+			ResponsePtr response = ResponsePtr(new Response(ResponseCode::OK, "OK"));
+			Packet(response).Send(socket);
 		}
-	} catch (NetworkError &e) {
-		std::cerr << "Error: " << e.what() << std::endl;
+	} catch (DisplayError &e) {
+		std::cerr << "Error: " << e.responseCode() << " (" << e.what() << ")" << std::endl;
+		ResponsePtr response = ResponsePtr(new Response(e.responseCode(), e.what()));
+
+		try {
+			Packet(response).Send(socket);
+		} catch (DisplayError &e) {
+			std::cerr << "Error while sending error: " << e.responseCode() << " - " << e.what() << std::endl;
+		}
 	}
 
 	std::cout << "Connection closed to " << socket.remote_endpoint() << std::endl;
 	socket.close();
 }
 
-uint32_t Server::ReadDataLength(tcp::socket &socket) {
-	std::vector<boost::asio::mutable_buffer> bufs;
-	boost::system::error_code error;
-	u_int32_t data_length;
-
-	bufs.push_back(boost::asio::buffer(&data_length, sizeof(data_length)));
-	boost::asio::read(socket, bufs, error);
-	if (error) {
-		boost::throw_exception(ReadError());
-	}
-
-	if (data_length > MAX_PACKET_SIZE) {
-		boost::throw_exception(PacketTooLargeError());
-	}
-
-	return data_length;
-}
-
-Packet Server::ReadData(tcp::socket &socket, uint32_t data_length) {
-	std::vector<boost::asio::mutable_buffer> bufs;
-	boost::system::error_code error;
-	std::vector<char> data(data_length);
-	uint32_t expectedCrc;
-
-	bufs.clear();
-	bufs.push_back(boost::asio::buffer(&data.front(), data_length));
-	bufs.push_back(boost::asio::buffer(&expectedCrc, sizeof(expectedCrc)));
-	boost::asio::read(socket, bufs, error);
-	if (error) {
-		boost::throw_exception(ReadError());
-	}
-
-	Packet packet(data);
-	if (packet.GetCRC() != expectedCrc) {
-		boost::throw_exception(CrcError());
-	}
-
-	return Packet(data);
-}
-
-void Server::HandlePacket(Packet packet) {
+void Server::HandlePacket(const Packet &packet) {
 	_display->ExecuteCommand(packet.GetCommand());
 }
+
