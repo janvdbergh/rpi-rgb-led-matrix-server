@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 14)
 add_subdirectory(src/cpp)
 
 install(
-		FILES fonts/*
+		FILES fonts/6x9.bdf
+		FILES fonts/9x18.bdf
 		DESTINATION rpi-rgb-led-matrix-server/bin/fonts
 )
