@@ -11,6 +11,8 @@ public:
 
 	bool Initialize(int argc, char **argv) override;
 
+	void SetBrightness(uint8_t brightness) override;
+
 	void SetColor(uint8_t r, uint8_t g, uint8_t b) override;
 
 	void Clear() override;
@@ -25,7 +27,7 @@ public:
 
 	void DrawLargeText(int16_t x, int16_t y, std::string text) override;
 
-	virtual void DrawImage(int16_t x, int16_t y, const std::string &imageName) override;
+	void DrawImage(int16_t x, int16_t y, const std::string &imageName) override;
 
 	void Show() override;
 

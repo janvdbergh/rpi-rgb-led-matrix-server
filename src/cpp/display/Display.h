@@ -18,6 +18,8 @@ public:
 
 	virtual bool Initialize(int argc, char **argv) =0;
 
+	virtual void SetBrightness(uint8_t brightness) =0;
+
 	virtual void SetColor(uint8_t r, uint8_t g, uint8_t b) =0;
 
 	virtual void Clear() =0;
