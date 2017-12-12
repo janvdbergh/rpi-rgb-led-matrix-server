@@ -4,23 +4,28 @@ from . import Util
 
 
 class CommandCode(Enum):
-	CLEAR = 0
-	SHOW = 1
-	COLOR = 2
-	PIXEL = 3
-	RECTANGLE = 4
-	DIGIT = 5
-	SMALL_TEXT = 6
-	LARGE_TEXT = 7
-	IMAGE = 8
-	ANIMATION = 9
-	SLEEP = 10
-	COMPOSITE = 11
-	DEFINE_IMAGE = 12
-	DEFINE_ANIMATION = 13
+	BRIGHTNESS = 0
+	CLEAR = 1
+	SHOW = 2
+	COLOR = 3
+	PIXEL = 4
+	RECTANGLE = 5
+	DIGIT = 6
+	SMALL_TEXT = 7
+	LARGE_TEXT = 8
+	IMAGE = 9
+	ANIMATION = 10
+	SLEEP = 11
+	COMPOSITE = 12
+	DEFINE_IMAGE = 13
+	DEFINE_ANIMATION = 14
 
 
 class Command:
+	@staticmethod
+	def brightness(brightness):
+		return Command(Util.to16BitUnsigned(CommandCode.BRIGHTNESS.value) + Util.to8BitUnsigned(brightness))
+
 	@staticmethod
 	def clear():
 		return Command(Util.to16BitUnsigned(CommandCode.CLEAR.value))
@@ -39,7 +44,8 @@ class Command:
 
 	@staticmethod
 	def rectangle(x, y, width, height):
-		return Command(Util.to16BitUnsigned(CommandCode.RECTANGLE.value) + Util.to16BitSigned(x) + Util.to16BitSigned(y) + Util.to16BitUnsigned(width) + Util.to16BitUnsigned(height))
+		return Command(
+			Util.to16BitUnsigned(CommandCode.RECTANGLE.value) + Util.to16BitSigned(x) + Util.to16BitSigned(y) + Util.to16BitUnsigned(width) + Util.to16BitUnsigned(height))
 
 	@staticmethod
 	def digit(position, digit):
