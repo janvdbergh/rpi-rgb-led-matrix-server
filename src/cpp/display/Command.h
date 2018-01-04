@@ -9,6 +9,7 @@
 class Display;
 
 enum CommandCode {
+	SET_BRIGHTNESS,
 	CLEAR,
 	SHOW,
 	COLOR,
@@ -34,6 +35,24 @@ public:
 
 typedef boost::shared_ptr<const Command> CommandPtr;
 typedef std::vector<CommandPtr> CommandVector;
+
+class BrightnessCommand: public Command {
+public:
+	explicit BrightnessCommand(uint8_t brightness) : _brightness(brightness) {};
+
+	CommandCode GetCode() const override {
+		return CommandCode::SET_BRIGHTNESS;
+	}
+
+	uint8_t GetBrightness() const {
+		return _brightness;
+	}
+
+	void Visit(Display &display) const override;
+private:
+	uint8_t _brightness;
+};
+
 
 class ClearCommand : public Command {
 public:

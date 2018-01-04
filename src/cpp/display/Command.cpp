@@ -1,5 +1,9 @@
 #include "Display.h"
 
+void BrightnessCommand::Visit(Display &display) const {
+	display.SetBrightness(_brightness);
+}
+
 void ClearCommand::Visit(Display &display) const {
 	display.Clear();
 }

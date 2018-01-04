@@ -43,6 +43,10 @@ bool LedMatrixDisplay::Initialize(int argc, char *argv[]) {
 	return true;
 }
 
+void LedMatrixDisplay::SetBrightness(uint8_t brightness) {
+	_rgbMatrix->SetBrightness(brightness);
+}
+
 void LedMatrixDisplay::SetColor(uint8_t r, uint8_t g, uint8_t b) {
 	_color = Color(r, g, b);
 }

@@ -13,6 +13,8 @@ public:
 
 	bool Initialize(int argc, char **argv) override;
 
+	void SetBrightness(uint8_t brightness) override;
+
 	void SetColor(uint8_t r, uint8_t g, uint8_t b) override;
 
 	void Clear() override;

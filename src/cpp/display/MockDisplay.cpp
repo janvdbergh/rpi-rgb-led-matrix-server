@@ -24,6 +24,10 @@ bool MockDisplay::Initialize(int argc, char *argv[]) {
 	return true;
 }
 
+void MockDisplay::SetBrightness(uint8_t brightness) {
+	std::cout << "SetBrightness(" << (int) brightness << ")" << std::endl;
+}
+
 void MockDisplay::SetColor(uint8_t r, uint8_t g, uint8_t b) {
 	std::cout << "SetColor(" << (int) r << ", " << (int) g << ", " << (int) b << ")" << std::endl;
 }

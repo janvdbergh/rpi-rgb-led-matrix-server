@@ -270,6 +270,9 @@ CommandPtr PacketReader::ReadCommand() {
 
 	CommandCode commandCode = ReadCommandCode();
 	switch (commandCode) {
+		case CommandCode ::SET_BRIGHTNESS:
+			return CommandPtr(new BrightnessCommand(ReadUint8()));
+
 		case CommandCode::CLEAR:
 			return CommandPtr(new ClearCommand());
 
@@ -372,6 +375,11 @@ void PacketWriter::Write(const CommandPtr &command) {
 		case CommandCode::SHOW: {
 			// no extra data
 			break;
+		}
+
+		case CommandCode::SET_BRIGHTNESS: {
+			auto &brightnessCommand = (const BrightnessCommand &) *command;
+			Write(brightnessCommand.GetBrightness());
 		}
 
 		case CommandCode::COLOR: {
