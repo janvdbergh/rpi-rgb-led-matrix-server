@@ -63,7 +63,15 @@ void MockDisplay::DrawImage(int16_t x, int16_t y, const std::string &imageName) 
 }
 
 void MockDisplay::Show() {
-	std::cout << "Show()" << std::endl << std::endl;
+	std::cout << "Show()" << std::endl;
+}
+
+void MockDisplay::SetLayer(uint8_t layer) {
+	std::cout << "SetLayer(" << (int) layer << ")" << std::endl;
+}
+
+void MockDisplay::ClearLayer() {
+	std::cout << "ClearLayer()" << std::endl << std::endl;
 }
 
 boost::shared_ptr<Display> CreateDisplay() {

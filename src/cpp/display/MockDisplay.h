@@ -31,6 +31,10 @@ public:
 
 	void DrawImage(int16_t x, int16_t y, const std::string &imageName) override;
 
+	void SetLayer(uint8_t layer) override;
+
+	void ClearLayer() override;
+
 	void Show() override;
 };
 

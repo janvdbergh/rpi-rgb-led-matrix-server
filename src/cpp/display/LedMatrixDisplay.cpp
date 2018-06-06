@@ -6,13 +6,17 @@ const int16_t DIGIT_START_Y = 12;
 const char *BDF_SMALL_FONT_FILE = "fonts/6x9.bdf";
 const char *BDF_LARGE_FONT_FILE = "fonts/9x18.bdf";
 
+const uint16_t ROWS = 32;
+const uint16_t CHAIN_LENGTH = 2;
+const uint16_t COLUMNS = CHAIN_LENGTH * 32;
+
 using namespace rgb_matrix;
 
 bool LedMatrixDisplay::Initialize(int argc, char *argv[]) {
 	RGBMatrix::Options options;
 	options.hardware_mapping = "adafruit-hat-pwm";
-	options.rows = 32;
-	options.chain_length = 2;
+	options.rows = ROWS;
+	options.chain_length = CHAIN_LENGTH;
 	options.parallel = 1;
 
 	RuntimeOptions runtimeOptions;
@@ -52,17 +56,17 @@ void LedMatrixDisplay::SetColor(uint8_t r, uint8_t g, uint8_t b) {
 }
 
 void LedMatrixDisplay::Clear() {
-	_frameCanvas->Clear();
+	_layers.clear();
 }
 
 void LedMatrixDisplay::DrawPixel(int16_t x, int16_t y) {
-	_frameCanvas->SetPixel(x, y, _color.r, _color.g, _color.b);
+	getCurrentLayer()->DrawPixel(x, y, _color);
 }
 
 void LedMatrixDisplay::DrawRectangle(int16_t x, int16_t y, uint16_t width, uint16_t height) {
-	for (int i = 0; i < width; i++) {
-		for (int j = 0; j < height; j++) {
-			_frameCanvas->SetPixel(x + i, y + j, _color.r, _color.g, _color.b);
+	for (int16_t i = 0; i < width; i++) {
+		for (int16_t j = 0; j < height; j++) {
+			DrawPixel(x + i, y + j);
 		}
 	}
 }
@@ -111,11 +115,13 @@ void LedMatrixDisplay::DrawDigit(uint8_t position, uint8_t digit) {
 }
 
 void LedMatrixDisplay::DrawSmallText(int16_t x, int16_t y, std::string text) {
-	DrawText(_frameCanvas, *_smallFont, x, y, _color, text.c_str());
+	Canvas &canvas = *this->getCurrentLayer();
+	DrawText(&canvas, *_smallFont, x, y, _color, text.c_str());
 }
 
 void LedMatrixDisplay::DrawLargeText(int16_t x, int16_t y, std::string text) {
-	DrawText(_frameCanvas, *_largeFont, x, y, _color, text.c_str());
+	Canvas &canvas = *this->getCurrentLayer();
+	DrawText(&canvas, *_largeFont, x, y, _color, text.c_str());
 }
 
 void LedMatrixDisplay::DrawImage(int16_t x, int16_t y, const std::string &imageName) {
@@ -123,13 +129,52 @@ void LedMatrixDisplay::DrawImage(int16_t x, int16_t y, const std::string &imageN
 
 	for (uint16_t i = 0; i < image->GetWidth(); i++) {
 		for (uint16_t j = 0; j < image->GetHeight(); j++) {
-			_frameCanvas->SetPixel(x + i, y + j, image->GetRed(i, j), image->GetGreen(i, j), image->GetBlue(i, j));
+			DrawPixel(x + i, y + j);
 		}
 	}
 }
 
+uint8_t updateUsingAlpha(uint8_t currentValue, uint8_t newValue, uint16_t alpha) {
+	int value = ((255 - alpha) * currentValue + alpha * newValue) / 255;
+	return static_cast<uint8_t>(value);
+}
+
 void LedMatrixDisplay::Show() {
+	for (int16_t x = 0; x < COLUMNS; x++) {
+		for (int16_t y = 0; y < ROWS; y++) {
+			uint8_t r = 0, g = 0, b = 0;
+
+			for (auto &_layer : _layers) {
+				Layer *layer = _layer.get();
+
+				uint8_t alpha = layer->GetAlpha();
+
+				r = updateUsingAlpha(r, layer->GetRed(x, y), alpha);
+				g = updateUsingAlpha(g, layer->GetGreen(x, y), alpha);
+				b = updateUsingAlpha(b, layer->GetBlue(x, y), alpha);
+			}
+
+			_frameCanvas->SetPixel(x, y, r, g, b);
+		}
+	}
+
 	_frameCanvas = _rgbMatrix->SwapOnVSync(_frameCanvas);
+}
+
+void LedMatrixDisplay::SetLayer(uint8_t layer) {
+	if (_layers.size() <= layer) {
+		_layers.resize(layer + 1);
+	}
+
+	if (!_layers[layer]) {
+		_layers[layer] = std::shared_ptr<Layer>(new Layer(COLUMNS, ROWS));
+	}
+
+	_currentLayer = layer;
+}
+
+void LedMatrixDisplay::ClearLayer() {
+	getCurrentLayer()->Clear();
 }
 
 boost::shared_ptr<Display> CreateDisplay() {

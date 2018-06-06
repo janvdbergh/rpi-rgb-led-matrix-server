@@ -4,10 +4,11 @@
 #include <led-matrix.h>
 #include <graphics.h>
 #include "Display.h"
+#include "Layer.h"
 
 class LedMatrixDisplay : public Display {
 public:
-	LedMatrixDisplay() : _frameCanvas(nullptr), _color(255, 255, 255) {}
+	LedMatrixDisplay() : _frameCanvas(nullptr), _color(255, 255, 255), _currentLayer(0) { this->SetLayer(0); }
 
 	bool Initialize(int argc, char **argv) override;
 
@@ -29,15 +30,24 @@ public:
 
 	void DrawImage(int16_t x, int16_t y, const std::string &imageName) override;
 
+	void SetLayer(uint8_t layer) override;
+
+	void ClearLayer() override;
+
 	void Show() override;
 
 private:
+	const std::shared_ptr<Layer> getCurrentLayer() { return _layers[_currentLayer]; };
+
 	std::unique_ptr<rgb_matrix::RGBMatrix> _rgbMatrix;
 	rgb_matrix::FrameCanvas *_frameCanvas;
 
 	rgb_matrix::Color _color;
 	std::unique_ptr<rgb_matrix::Font> _smallFont;
 	std::unique_ptr<rgb_matrix::Font> _largeFont;
+
+	uint8_t _currentLayer;
+	std::vector<std::shared_ptr<Layer>> _layers;
 };
 
 #endif //DISPLAYSERVER_LEDMATRIXDISPLAY_H

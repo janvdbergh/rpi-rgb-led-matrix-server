@@ -17,7 +17,8 @@ add_executable(DisplayServerLed
 		display/Command.cpp
 		display/Display.cpp
 		display/LedMatrixDisplay.cpp
-		display/Response.cpp)
+		display/Response.cpp
+		display/Layer.cpp)
 target_link_libraries(DisplayServerLed rgbmatrix ${Boost_LIBRARIES} pthread)
 
 # Mock display
@@ -30,7 +31,8 @@ add_executable(DisplayServerMock
 		display/Command.cpp
 		display/Display.cpp
 		display/MockDisplay.cpp
-		display/Response.cpp)
+		display/Response.cpp
+		display/Layer.cpp)
 target_link_libraries(DisplayServerMock ${Boost_LIBRARIES} pthread)
 
 # Client library

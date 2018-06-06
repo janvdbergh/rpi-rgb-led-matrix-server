@@ -270,7 +270,7 @@ CommandPtr PacketReader::ReadCommand() {
 
 	CommandCode commandCode = ReadCommandCode();
 	switch (commandCode) {
-		case CommandCode ::SET_BRIGHTNESS:
+		case CommandCode::SET_BRIGHTNESS:
 			return CommandPtr(new BrightnessCommand(ReadUint8()));
 
 		case CommandCode::CLEAR:
@@ -323,6 +323,12 @@ CommandPtr PacketReader::ReadCommand() {
 		case CommandCode::DEFINE_ANIMATION:
 			return CommandPtr(new DefineAnimationCommand(ReadString(), ReadCommand()));
 
+		case CommandCode::SET_LAYER:
+			return CommandPtr(new SetLayerCommand(ReadUint8()));
+
+		case CommandCode::CLEAR_LAYER:
+			return CommandPtr(new ClearLayerCommand());
+
 		default:
 			boost::throw_exception(DisplayError(UNKNOWN_COMMAND, GetUnknownCommandMessage(commandCode)));
 	}
@@ -372,7 +378,8 @@ void PacketWriter::Write(const CommandPtr &command) {
 
 	switch (command->GetCode()) {
 		case CommandCode::CLEAR:
-		case CommandCode::SHOW: {
+		case CommandCode::SHOW:
+		case CommandCode::CLEAR_LAYER: {
 			// no extra data
 			break;
 		}
@@ -469,6 +476,12 @@ void PacketWriter::Write(const CommandPtr &command) {
 			auto &defineAnimationCommand = (const DefineAnimationCommand &) *command;
 			Write(defineAnimationCommand.GetName());
 			Write(defineAnimationCommand.GetCommand());
+			break;
+		}
+
+		case CommandCode::SET_LAYER: {
+			auto &setLayerCommand = (const SetLayerCommand&)*command;
+			Write(setLayerCommand.GetLayer());
 			break;
 		}
 

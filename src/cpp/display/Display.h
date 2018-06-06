@@ -40,6 +40,10 @@ public:
 
 	virtual void Sleep(uint16_t millis);
 
+	virtual void SetLayer(uint8_t layer) =0;
+
+	virtual void ClearLayer() =0;
+
 	virtual void Show() =0;
 
 	void DefineImage(const std::string &name, const ImagePtr &image);

@@ -23,7 +23,9 @@ enum CommandCode {
 	SLEEP,
 	COMPOSITE,
 	DEFINE_IMAGE,
-	DEFINE_ANIMATION
+	DEFINE_ANIMATION,
+	SET_LAYER,
+	CLEAR_LAYER
 };
 
 class Command {
@@ -36,7 +38,7 @@ public:
 typedef boost::shared_ptr<const Command> CommandPtr;
 typedef std::vector<CommandPtr> CommandVector;
 
-class BrightnessCommand: public Command {
+class BrightnessCommand : public Command {
 public:
 	explicit BrightnessCommand(uint8_t brightness) : _brightness(brightness) {};
 
@@ -49,6 +51,7 @@ public:
 	}
 
 	void Visit(Display &display) const override;
+
 private:
 	uint8_t _brightness;
 };
@@ -262,7 +265,7 @@ private:
 
 class AnimationCommand : public Command {
 public:
-	AnimationCommand(std::string name) : _name(std::move(name)) {}
+	explicit AnimationCommand(std::string name) : _name(std::move(name)) {}
 
 	CommandCode GetCode() const override {
 		return CommandCode::ANIMATION;
@@ -365,6 +368,35 @@ public:
 private:
 	std::string _name;
 	CommandPtr _command;
+};
+
+class SetLayerCommand : public Command {
+public:
+	explicit SetLayerCommand(uint8_t layer) : _layer(layer) {}
+
+	CommandCode GetCode() const override {
+		return CommandCode::SET_LAYER;
+	}
+
+	uint8_t GetLayer() const {
+		return _layer;
+	}
+
+	void Visit(Display &display) const override;
+
+private:
+	uint8_t _layer;
+};
+
+class ClearLayerCommand : public Command {
+public:
+	explicit ClearLayerCommand() = default;
+
+	CommandCode GetCode() const override {
+		return CommandCode::CLEAR_LAYER;
+	}
+
+	void Visit(Display &display) const override;
 };
 
 #endif //DISPLAYSERVER_COMMAND_H

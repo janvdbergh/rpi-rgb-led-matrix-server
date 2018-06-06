@@ -31,6 +31,7 @@ private:
 	ResponseCode _responseCode;
 	std::string _detailMessage;
 };
+
 typedef boost::shared_ptr<Response> ResponsePtr;
 
 
