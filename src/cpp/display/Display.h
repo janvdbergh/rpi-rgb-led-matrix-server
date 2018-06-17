@@ -44,7 +44,7 @@ public:
 
 	virtual void ClearLayer() =0;
 
-	virtual void SetLayerAlpha(uint8_t layer, uint8_t alpha) = 0;
+	virtual void SetLayerAlpha(uint8_t alpha) = 0;
 
 	virtual void Show() =0;
 

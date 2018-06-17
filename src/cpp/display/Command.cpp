@@ -71,5 +71,5 @@ void ClearLayerCommand::Visit(Display &display) const {
 }
 
 void SetLayerAlphaCommand::Visit(Display &display) const {
-	display.SetLayerAlpha(_layer, _alpha);
+	display.SetLayerAlpha(_alpha);
 }

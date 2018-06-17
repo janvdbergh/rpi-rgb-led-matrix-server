@@ -29,13 +29,17 @@ int main(int argc, char *argv[]) {
 	client
 			.SendCommand(CommandPtr(new ClearCommand))
 			.SendCommand(CommandPtr(new SetLayerCommand(0)))
-			.SendCommand(CommandPtr(new SetLayerAlphaCommand(0, 255)))
+			.SendCommand(CommandPtr(new SetLayerAlphaCommand(32)))
 			.SendCommand(CommandPtr(new ColorCommand(255, 0, 0)))
 			.SendCommand(CommandPtr(new RectangleCommand(5, 5, 10, 10)))
 			.SendCommand(CommandPtr(new SetLayerCommand(1)))
-			.SendCommand(CommandPtr(new SetLayerAlphaCommand(1, 128)))
+			.SendCommand(CommandPtr(new SetLayerAlphaCommand(32)))
 			.SendCommand(CommandPtr(new ColorCommand(0, 255, 0)))
 			.SendCommand(CommandPtr(new RectangleCommand(10, 10, 10, 10)))
+			.SendCommand(CommandPtr(new SetLayerCommand(2)))
+			.SendCommand(CommandPtr(new SetLayerAlphaCommand(32)))
+			.SendCommand(CommandPtr(new ColorCommand(0, 0, 255)))
+			.SendCommand(CommandPtr(new RectangleCommand(15, 15, 10, 10)))
 			.SendCommand(CommandPtr(new ShowCommand));
 
 	sleep(3);

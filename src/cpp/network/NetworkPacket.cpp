@@ -330,7 +330,7 @@ CommandPtr PacketReader::ReadCommand() {
 			return CommandPtr(new ClearLayerCommand());
 
 		case CommandCode::SET_LAYER_ALPHA:
-			return CommandPtr(new SetLayerAlphaCommand(ReadUint8(), ReadUint8()));
+			return CommandPtr(new SetLayerAlphaCommand(ReadUint8()));
 
 		default:
 			boost::throw_exception(DisplayError(UNKNOWN_COMMAND, GetUnknownCommandMessage(commandCode)));
@@ -490,7 +490,6 @@ void PacketWriter::Write(const CommandPtr &command) {
 
 		case CommandCode::SET_LAYER_ALPHA: {
 			auto &setLayerCommand = (const SetLayerAlphaCommand&)*command;
-			Write(setLayerCommand.GetLayer());
 			Write(setLayerCommand.GetAlpha());
 			break;
 		}

@@ -74,8 +74,8 @@ void MockDisplay::ClearLayer() {
 	std::cout << "ClearLayer()" << std::endl << std::endl;
 }
 
-void MockDisplay::SetLayerAlpha(uint8_t layer, uint8_t alpha) {
-	std::cout << "SetLayerAlpha(" << (int) layer << ", " << (int) alpha << ")" << std::endl;
+void MockDisplay::SetLayerAlpha(uint8_t alpha) {
+	std::cout << "SetLayerAlpha(" << (int) alpha << ")" << std::endl;
 }
 
 boost::shared_ptr<Display> CreateDisplay() {
