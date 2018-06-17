@@ -21,9 +21,10 @@ int main(int argc, char *argv[]) {
 	commands.emplace_back(CommandPtr(new ShowCommand()));
 	CommandPtr composite = CommandPtr(new CompositeCommand(commands));
 
-	client.SendCommand(CommandPtr(new DefineImageCommand("test", imageBuilder.Build()))).SendCommand(
-			CommandPtr(new DefineAnimationCommand("animation", composite))).SendCommand(
-			CommandPtr(new AnimationCommand("animation")));
+	client
+			.SendCommand(CommandPtr(new DefineImageCommand("test", imageBuilder.Build())))
+			.SendCommand(CommandPtr(new DefineAnimationCommand("animation", composite)))
+			.SendCommand(CommandPtr(new AnimationCommand("animation")));
 	sleep(3);
 
 	return 0;
