@@ -30,16 +30,16 @@ public:
 
 	void DrawImage(int16_t x, int16_t y, const std::string &imageName) override;
 
-	void SetLayer(uint8_t layer) override {
-		_currentLayer = layer;
-	}
+	void SetLayer(uint8_t layer) override;
 
 	void ClearLayer() override;
 
 	void Show() override;
 
 private:
-	const std::shared_ptr<Layer> getCurrentLayer();
+	const std::shared_ptr<Layer> getCurrentLayer() {
+		return _layers[_currentLayer];
+	}
 
 	std::unique_ptr<rgb_matrix::RGBMatrix> _rgbMatrix;
 	rgb_matrix::FrameCanvas *_frameCanvas;

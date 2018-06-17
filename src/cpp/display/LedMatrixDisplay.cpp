@@ -165,7 +165,7 @@ void LedMatrixDisplay::ClearLayer() {
 	getCurrentLayer()->Clear();
 }
 
-const std::shared_ptr<Layer> LedMatrixDisplay::getCurrentLayer() {
+void LedMatrixDisplay::SetLayer(uint8_t layer) {
 	if (_layers.size() <= _currentLayer) {
 		_layers.resize(_currentLayer + 1);
 	}
@@ -173,8 +173,6 @@ const std::shared_ptr<Layer> LedMatrixDisplay::getCurrentLayer() {
 	if (!_layers[_currentLayer]) {
 		_layers[_currentLayer] = std::shared_ptr<Layer>(new Layer(COLUMNS, ROWS));
 	}
-
-	return _layers[_currentLayer];
 }
 
 boost::shared_ptr<Display> CreateDisplay() {
