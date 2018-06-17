@@ -57,6 +57,8 @@ void LedMatrixDisplay::SetColor(uint8_t r, uint8_t g, uint8_t b) {
 
 void LedMatrixDisplay::Clear() {
 	_layers.clear();
+
+	SetLayer(0);
 }
 
 void LedMatrixDisplay::DrawPixel(int16_t x, int16_t y) {
