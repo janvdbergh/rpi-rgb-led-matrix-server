@@ -167,6 +167,10 @@ void LedMatrixDisplay::ClearLayer() {
 	getCurrentLayer()->Clear();
 }
 
+void LedMatrixDisplay::SetLayerAlpha(uint8_t layer, uint8_t alpha) {
+	getCurrentLayer()->SetAlpha(alpha);
+}
+
 void LedMatrixDisplay::SetLayer(uint8_t layer) {
 	if (_layers.size() <= _currentLayer) {
 		_layers.resize(_currentLayer + 1);

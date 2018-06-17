@@ -69,3 +69,7 @@ void SetLayerCommand::Visit(Display &display) const {
 void ClearLayerCommand::Visit(Display &display) const {
 	display.ClearLayer();
 }
+
+void SetLayerAlphaCommand::Visit(Display &display) const {
+	display.SetLayerAlpha(_layer, _alpha);
+}

@@ -34,6 +34,8 @@ public:
 
 	void ClearLayer() override;
 
+	void SetLayerAlpha(uint8_t layer, uint8_t alpha) override;
+
 	void Show() override;
 
 private:

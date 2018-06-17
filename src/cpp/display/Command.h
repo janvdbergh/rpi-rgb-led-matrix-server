@@ -25,7 +25,8 @@ enum CommandCode {
 	DEFINE_IMAGE,
 	DEFINE_ANIMATION,
 	SET_LAYER,
-	CLEAR_LAYER
+	CLEAR_LAYER,
+	SET_LAYER_ALPHA
 };
 
 class Command {
@@ -397,6 +398,28 @@ public:
 	}
 
 	void Visit(Display &display) const override;
+};
+
+class SetLayerAlphaCommand: public Command {
+public:
+	explicit SetLayerAlphaCommand(uint8_t layer, uint8_t alpha): _layer(layer), _alpha(alpha) {}
+
+	CommandCode GetCode() const override {
+		return CommandCode::SET_LAYER_ALPHA;
+	}
+
+	uint8_t GetLayer() const {
+		return _layer;
+	}
+
+	uint8_t GetAlpha() const {
+		return _alpha;
+	}
+
+	void Visit(Display &display) const override;
+private:
+	uint8_t _layer;
+	uint8_t _alpha;
 };
 
 #endif //DISPLAYSERVER_COMMAND_H

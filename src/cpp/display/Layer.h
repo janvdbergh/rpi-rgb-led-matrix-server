@@ -25,6 +25,7 @@ public:
 	uint8_t GetGreen(int16_t x, int16_t y) const;
 	uint8_t GetBlue(int16_t x, int16_t y) const;
 
+	void SetAlpha(uint8_t alpha) { _alpha = alpha; }
 private:
 	std::vector<uint8_t> _r, _g, _b;
 	uint8_t _alpha;
