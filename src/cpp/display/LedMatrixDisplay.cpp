@@ -161,20 +161,20 @@ void LedMatrixDisplay::Show() {
 	_frameCanvas = _rgbMatrix->SwapOnVSync(_frameCanvas);
 }
 
-void LedMatrixDisplay::SetLayer(uint8_t layer) {
-	if (_layers.size() <= layer) {
-		_layers.resize(layer + 1);
-	}
-
-	if (!_layers[layer]) {
-		_layers[layer] = std::shared_ptr<Layer>(new Layer(COLUMNS, ROWS));
-	}
-
-	_currentLayer = layer;
-}
-
 void LedMatrixDisplay::ClearLayer() {
 	getCurrentLayer()->Clear();
+}
+
+const std::shared_ptr<Layer> LedMatrixDisplay::getCurrentLayer() {
+	if (_layers.size() <= _currentLayer) {
+		_layers.resize(_currentLayer + 1);
+	}
+
+	if (!_layers[_currentLayer]) {
+		_layers[_currentLayer] = std::shared_ptr<Layer>(new Layer(COLUMNS, ROWS));
+	}
+
+	return _layers[_currentLayer];
 }
 
 boost::shared_ptr<Display> CreateDisplay() {
