@@ -131,6 +131,7 @@ void LedMatrixDisplay::DrawImage(int16_t x, int16_t y, const std::string &imageN
 
 	for (uint16_t i = 0; i < image->GetWidth(); i++) {
 		for (uint16_t j = 0; j < image->GetHeight(); j++) {
+			SetColor(image->GetRed(i, j), image->GetGreen(i, j), image->GetBlue(i, j));
 			DrawPixel(x + i, y + j);
 		}
 	}
