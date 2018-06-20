@@ -38,6 +38,7 @@ CMakeCache.txt
 
 # Alternative build files
 build
+venv
 
 # Python files
 __pycache__

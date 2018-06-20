@@ -61,3 +61,15 @@ void DefineImageCommand::Visit(Display &display) const {
 void DefineAnimationCommand::Visit(Display &display) const {
 	display.DefineAnimation(_name, _command);
 }
+
+void SetLayerCommand::Visit(Display &display) const {
+	display.SetLayer(_layer);
+}
+
+void ClearLayerCommand::Visit(Display &display) const {
+	display.ClearLayer();
+}
+
+void SetLayerAlphaCommand::Visit(Display &display) const {
+	display.SetLayerAlpha(_alpha);
+}
