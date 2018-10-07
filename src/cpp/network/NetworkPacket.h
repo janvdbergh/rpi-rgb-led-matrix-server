@@ -7,7 +7,7 @@
 #include "../display/Command.h"
 #include "../display/Response.h"
 
-const uint32_t MAX_PACKET_SIZE = 8192;
+const uint32_t MAX_PACKET_SIZE = 8192 * 8;
 
 class Packet {
 public:
