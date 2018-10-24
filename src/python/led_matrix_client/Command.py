@@ -21,6 +21,7 @@ class CommandCode(Enum):
 	DEFINE_ANIMATION = 14
 	SET_LAYER = 15
 	CLEAR_LAYER = 16
+	SET_LAYER_ALPHA = 17
 
 
 class Command:
@@ -112,6 +113,10 @@ class Command:
 	@staticmethod
 	def clearLayer():
 		return Command(Util.to16BitUnsigned(CommandCode.CLEAR_LAYER.value))
+
+	@staticmethod
+	def setLayerAlpha(alpha):
+		return Command(Util.to16BitUnsigned(CommandCode.SET_LAYER_ALPHA.value) + Util.to8BitUnsigned(alpha))
 
 	def __init__(self, data):
 		self.data = Util.to16BitUnsigned(0xC0) + data
