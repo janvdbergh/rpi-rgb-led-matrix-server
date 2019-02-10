@@ -1,38 +1,60 @@
 #ifndef DISPLAYSERVER_LAYER_H
 #define DISPLAYSERVER_LAYER_H
 
-#include <cstdint>
 #include <vector>
-#include <graphics.h>
+#include <boost/shared_ptr.hpp>
+#include "../datatype/Point.h"
+#include "../command/Command.h"
 
-class Layer: public rgb_matrix::Canvas {
+class Layer {
 public:
-	Layer(uint16_t width, uint16_t height);
+	Layer(Point offset, uint16_t width, uint16_t height) :
+			_width(width), _height(height), _offset(offset), _alpha(255), _pixels(width * height) {}
 
-	void DrawPixel(int16_t x, int16_t y, rgb_matrix::Color color) {
-		this->SetPixel(x, y, color.r, color.g, color.b);
-	}
-	void SetPixel(int x, int y, uint8_t red, uint8_t green, uint8_t blue) override;
+	const Pixel get_pixel(Point location) const;
 
-	void Clear() override { Fill(0, 0, 0); }
-	void Fill(uint8_t red, uint8_t green, uint8_t blue) override;
+	void set_pixel(Point location, Pixel value);
 
-	int width() const override { return _width; };
-	int height() const override { return _height; };
+	void clear() { fill(Pixel()); }
 
-	uint8_t GetAlpha() const { return _alpha; }
-	uint8_t GetRed(int16_t x, int16_t y) const;
-	uint8_t GetGreen(int16_t x, int16_t y) const;
-	uint8_t GetBlue(int16_t x, int16_t y) const;
+	void fill(Pixel value);
 
-	void SetAlpha(uint8_t alpha) { _alpha = alpha; }
+	void rectangle(Point location, uint16_t width, uint16_t height, Pixel value);
+
+	void draw_image(Point location, const ImagePtr& image);
+
+	int get_width() const { return _width; };
+
+	int get_height() const { return _height; };
+
+	Point get_offset() const { return _offset; }
+
+	uint8_t get_alpha() const { return _alpha; }
+
+	void set_alpha(uint8_t alpha) { _alpha = alpha; }
+
 private:
-	std::vector<uint8_t> _r, _g, _b;
+	std::vector<Pixel> _pixels;
 	uint8_t _alpha;
+	Point _offset;
 	uint16_t _width, _height;
 
-	uint16_t _index(int16_t x, int16_t y) const;
+	int16_t get_relative_x(Point location) const {
+		return location.get_x() - _offset.get_x();
+	}
+
+	int16_t get_relative_y(Point location) const {
+		return location.get_y() - _offset.get_y();
+	}
+
+	bool is_valid(Point location) const {
+		int16_t x0 = get_relative_x(location);
+		int16_t y0 = get_relative_y(location);
+		return x0 >= 0 && x0 < _width && y0 >= 0 && y0 < _height;
+	}
 };
+
+typedef boost::shared_ptr<Layer> LayerPtr;
 
 
 #endif //DISPLAYSERVER_LAYER_H

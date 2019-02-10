@@ -1,36 +1,25 @@
+#include <utility>
+
 #ifndef DISPLAYSERVER_PACKET_H
 #define DISPLAYSERVER_PACKET_H
 
 #include <vector>
 #include <string>
-#include "../display/Image.h"
-#include "../display/Command.h"
-#include "../display/Response.h"
 
 const uint32_t MAX_PACKET_SIZE = 8192 * 8;
 
-class Packet {
+class NetworkPacket {
 public:
-	explicit Packet(const CommandPtr &command);
+	explicit NetworkPacket(std::vector<uint8_t> _data) : _data(std::move(_data)) {}
 
-	explicit Packet(const ResponsePtr &response);
+	const std::vector<uint8_t> &get_data() const { return _data; }
 
-	explicit Packet(boost::asio::ip::tcp::socket& socket);
+	uint32_t get_crc() const;
 
-	uint32_t GetSize() const { return static_cast<uint32_t>(_data.size()); }
-
-	const std::vector<char> &GetData() const { return _data; }
-
-	uint32_t GetCRC() const;
-
-	CommandPtr GetCommand() const;
-
-	ResponsePtr GetResponse() const;
-
-	void Send(boost::asio::ip::tcp::socket& socket);
-
-private:
-	std::vector<char> _data;
+protected:
+	const std::vector<uint8_t > _data;
 };
+
+typedef std::shared_ptr<NetworkPacket> NetworkPacketPtr;
 
 #endif //DISPLAYSERVER_PACKET_H

@@ -4,7 +4,7 @@
 #include <map>
 #include <string>
 #include <boost/shared_ptr.hpp>
-#include "Command.h"
+#include "OldCommand.h"
 
 class Display {
 public:
@@ -12,7 +12,7 @@ public:
 
 	virtual void Reset();
 
-	void ExecuteCommand(const CommandPtr &command) {
+	void ExecuteCommand(const OldCommandPtr &command) {
 		command->Visit(*this);
 	}
 
@@ -50,18 +50,20 @@ public:
 
 	void DefineImage(const std::string &name, const ImagePtr &image);
 
-	virtual void DefineAnimation(const std::string &name, const CommandPtr &command);
+	virtual void DefineAnimation(const std::string &name, const OldCommandPtr &command);
 
 protected:
 	const ImagePtr GetImage(const std::string &name) const;
 
-	const CommandPtr GetAnimation(const std::string &name) const;
+	const OldCommandPtr GetAnimation(const std::string &name) const;
 
 private:
 	std::map<std::string, ImagePtr> _images;
-	std::map<std::string, CommandPtr> _animations;
+	std::map<std::string, OldCommandPtr> _animations;
 };
 
-boost::shared_ptr<Display> CreateDisplay();
+typedef boost::shared_ptr<Display> DisplayPtr;
+
+DisplayPtr CreateDisplay();
 
 #endif //DISPLAYSERVER_DISPLAY_H

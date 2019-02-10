@@ -21,11 +21,11 @@ const ImagePtr Display::GetImage(const std::string &name) const {
 	return iterator->second;
 }
 
-void Display::DefineAnimation(const std::string &name, const CommandPtr &command) {
+void Display::DefineAnimation(const std::string &name, const OldCommandPtr &command) {
 	_animations[name] = command;
 }
 
-const CommandPtr Display::GetAnimation(const std::string &name) const {
+const OldCommandPtr Display::GetAnimation(const std::string &name) const {
 	auto iterator = _animations.find(name);
 	if (iterator == _animations.end()) {
 		boost::throw_exception(DisplayError(UNKNOWN_ANIMATION, "Unknown animation"));
@@ -39,6 +39,6 @@ void Display::Sleep(uint16_t millis) {
 }
 
 void Display::ShowAnimation(const std::string &name) {
-	CommandPtr command = GetAnimation(name);
+	OldCommandPtr command = GetAnimation(name);
 	this->ExecuteCommand(command);
 }

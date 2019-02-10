@@ -8,7 +8,7 @@
 
 class Display;
 
-enum CommandCode {
+enum OldCommandCode {
 	SET_BRIGHTNESS,
 	CLEAR,
 	SHOW,
@@ -29,22 +29,22 @@ enum CommandCode {
 	SET_LAYER_ALPHA
 };
 
-class Command {
+class OldCommand {
 public:
-	virtual CommandCode GetCode() const =0;
+	virtual OldCommandCode GetCode() const =0;
 
 	virtual void Visit(Display &display) const =0;
 };
 
-typedef boost::shared_ptr<const Command> CommandPtr;
-typedef std::vector<CommandPtr> CommandVector;
+typedef boost::shared_ptr<const OldCommand> OldCommandPtr;
+typedef std::vector<OldCommandPtr> OldCommandVector;
 
-class BrightnessCommand : public Command {
+class BrightnessCommand : public OldCommand {
 public:
 	explicit BrightnessCommand(uint8_t brightness) : _brightness(brightness) {};
 
-	CommandCode GetCode() const override {
-		return CommandCode::SET_BRIGHTNESS;
+	OldCommandCode GetCode() const override {
+		return OldCommandCode::SET_BRIGHTNESS;
 	}
 
 	uint8_t GetBrightness() const {
@@ -58,34 +58,34 @@ private:
 };
 
 
-class ClearCommand : public Command {
+class ClearCommand : public OldCommand {
 public:
 	ClearCommand() = default;
 
-	CommandCode GetCode() const override {
-		return CommandCode::CLEAR;
+	OldCommandCode GetCode() const override {
+		return OldCommandCode::CLEAR;
 	}
 
 	void Visit(Display &display) const override;
 };
 
-class ShowCommand : public Command {
+class ShowCommand : public OldCommand {
 public:
 	ShowCommand() = default;
 
-	CommandCode GetCode() const override {
-		return CommandCode::SHOW;
+	OldCommandCode GetCode() const override {
+		return OldCommandCode::SHOW;
 	}
 
 	void Visit(Display &display) const override;
 };
 
-class ColorCommand : public Command {
+class ColorCommand : public OldCommand {
 public:
 	ColorCommand(uint8_t red, uint8_t green, uint8_t blue) : _red(red), _green(green), _blue(blue) {}
 
-	CommandCode GetCode() const override {
-		return CommandCode::COLOR;
+	OldCommandCode GetCode() const override {
+		return OldCommandCode::COLOR;
 	}
 
 	uint8_t GetRed() const {
@@ -107,12 +107,12 @@ private:
 	uint8_t _red, _green, _blue;
 };
 
-class PixelCommand : public Command {
+class PixelCommand : public OldCommand {
 public:
 	PixelCommand(int16_t x, int16_t y) : _x(x), _y(y) {}
 
-	CommandCode GetCode() const override {
-		return CommandCode::PIXEL;
+	OldCommandCode GetCode() const override {
+		return OldCommandCode::PIXEL;
 	}
 
 	int16_t GetX() const {
@@ -129,13 +129,13 @@ private:
 	int16_t _x, _y;
 };
 
-class RectangleCommand : public Command {
+class RectangleCommand : public OldCommand {
 public:
 	RectangleCommand(int16_t x, int16_t y, uint16_t width, uint16_t height) :
 			_x(x), _y(y), _width(width), _height(height) {}
 
-	CommandCode GetCode() const override {
-		return CommandCode::RECTANGLE;
+	OldCommandCode GetCode() const override {
+		return OldCommandCode::RECTANGLE;
 	}
 
 	int16_t GetX() const {
@@ -161,12 +161,12 @@ private:
 	uint16_t _width, _height;
 };
 
-class DigitCommand : public Command {
+class DigitCommand : public OldCommand {
 public:
 	DigitCommand(uint8_t position, uint8_t digit) : _position(position), _digit(digit) {}
 
-	CommandCode GetCode() const override {
-		return CommandCode::DIGIT;
+	OldCommandCode GetCode() const override {
+		return OldCommandCode::DIGIT;
 	}
 
 	uint8_t GetPosition() const {
@@ -183,12 +183,12 @@ private:
 	uint8_t _position, _digit;
 };
 
-class SmallTextCommand : public Command {
+class SmallTextCommand : public OldCommand {
 public:
 	SmallTextCommand(int16_t x, int16_t y, std::string text) : _x(x), _y(y), _text(std::move(text)) {}
 
-	CommandCode GetCode() const override {
-		return CommandCode::SMALL_TEXT;
+	OldCommandCode GetCode() const override {
+		return OldCommandCode::SMALL_TEXT;
 	}
 
 	int16_t GetX() const {
@@ -210,12 +210,12 @@ private:
 	std::string _text;
 };
 
-class LargeTextCommand : public Command {
+class LargeTextCommand : public OldCommand {
 public:
 	LargeTextCommand(int16_t x, int16_t y, std::string text) : _x(x), _y(y), _text(std::move(text)) {}
 
-	CommandCode GetCode() const override {
-		return CommandCode::LARGE_TEXT;
+	OldCommandCode GetCode() const override {
+		return OldCommandCode::LARGE_TEXT;
 	}
 
 	int16_t GetX() const {
@@ -237,12 +237,12 @@ private:
 	std::string _text;
 };
 
-class ImageCommand : public Command {
+class ImageCommand : public OldCommand {
 public:
 	ImageCommand(int16_t x, int16_t y, std::string name) : _x(x), _y(y), _name(std::move(name)) {}
 
-	CommandCode GetCode() const override {
-		return CommandCode::IMAGE;
+	OldCommandCode GetCode() const override {
+		return OldCommandCode::IMAGE;
 	}
 
 	int16_t GetX() const {
@@ -264,12 +264,12 @@ private:
 	std::string _name;
 };
 
-class AnimationCommand : public Command {
+class AnimationCommand : public OldCommand {
 public:
 	explicit AnimationCommand(std::string name) : _name(std::move(name)) {}
 
-	CommandCode GetCode() const override {
-		return CommandCode::ANIMATION;
+	OldCommandCode GetCode() const override {
+		return OldCommandCode::ANIMATION;
 	}
 
 	const std::string &GetName() const {
@@ -282,12 +282,12 @@ private:
 	std::string _name;
 };
 
-class SleepCommand : public Command {
+class SleepCommand : public OldCommand {
 public:
 	explicit SleepCommand(uint16_t millis) : _millis(millis) {}
 
-	CommandCode GetCode() const override {
-		return CommandCode::SLEEP;
+	OldCommandCode GetCode() const override {
+		return OldCommandCode::SLEEP;
 	};
 
 	uint16_t GetMillis() const {
@@ -300,19 +300,19 @@ private:
 	uint16_t _millis;
 };
 
-class CompositeCommand : public Command {
+class CompositeCommand : public OldCommand {
 public:
-	explicit CompositeCommand(const CommandVector &commands) : _commands(commands) {}
+	explicit CompositeCommand(const OldCommandVector &commands) : _commands(commands) {}
 
-	CommandCode GetCode() const override {
-		return CommandCode::COMPOSITE;
+	OldCommandCode GetCode() const override {
+		return OldCommandCode::COMPOSITE;
 	}
 
-	CommandVector GetCommands() const {
+	OldCommandVector GetCommands() const {
 		return _commands;
 	}
 
-	CompositeCommand &operator<<(CommandPtr command) {
+	CompositeCommand &operator<<(OldCommandPtr command) {
 		_commands.push_back(command);
 		return *this;
 	}
@@ -320,16 +320,16 @@ public:
 	void Visit(Display &display) const override;
 
 private:
-	CommandVector _commands;
+	OldCommandVector _commands;
 };
 
 
-class DefineImageCommand : public Command {
+class DefineImageCommand : public OldCommand {
 public:
 	DefineImageCommand(std::string name, ImagePtr image) : name(std::move(name)), _image(std::move(image)) {}
 
-	CommandCode GetCode() const override {
-		return CommandCode::DEFINE_IMAGE;
+	OldCommandCode GetCode() const override {
+		return OldCommandCode::DEFINE_IMAGE;
 	}
 
 	const std::string &GetName() const {
@@ -347,20 +347,20 @@ private:
 	ImagePtr _image;
 };
 
-class DefineAnimationCommand : public Command {
+class DefineAnimationCommand : public OldCommand {
 public:
-	DefineAnimationCommand(std::string name, CommandPtr command) :
+	DefineAnimationCommand(std::string name, OldCommandPtr command) :
 			_name(std::move(name)), _command(std::move(command)) {}
 
-	CommandCode GetCode() const override {
-		return CommandCode::DEFINE_ANIMATION;
+	OldCommandCode GetCode() const override {
+		return OldCommandCode::DEFINE_ANIMATION;
 	}
 
 	const std::string &GetName() const {
 		return _name;
 	}
 
-	const CommandPtr &GetCommand() const {
+	const OldCommandPtr &GetCommand() const {
 		return _command;
 	}
 
@@ -368,15 +368,15 @@ public:
 
 private:
 	std::string _name;
-	CommandPtr _command;
+	OldCommandPtr _command;
 };
 
-class SetLayerCommand : public Command {
+class SetLayerCommand : public OldCommand {
 public:
 	explicit SetLayerCommand(uint8_t layer) : _layer(layer) {}
 
-	CommandCode GetCode() const override {
-		return CommandCode::SET_LAYER;
+	OldCommandCode GetCode() const override {
+		return OldCommandCode::SET_LAYER;
 	}
 
 	uint8_t GetLayer() const {
@@ -389,23 +389,23 @@ private:
 	uint8_t _layer;
 };
 
-class ClearLayerCommand : public Command {
+class ClearLayerCommand : public OldCommand {
 public:
 	explicit ClearLayerCommand() = default;
 
-	CommandCode GetCode() const override {
-		return CommandCode::CLEAR_LAYER;
+	OldCommandCode GetCode() const override {
+		return OldCommandCode::CLEAR_LAYER;
 	}
 
 	void Visit(Display &display) const override;
 };
 
-class SetLayerAlphaCommand: public Command {
+class SetLayerAlphaCommand: public OldCommand {
 public:
 	explicit SetLayerAlphaCommand(uint8_t alpha): _alpha(alpha) {}
 
-	CommandCode GetCode() const override {
-		return CommandCode::SET_LAYER_ALPHA;
+	OldCommandCode GetCode() const override {
+		return OldCommandCode::SET_LAYER_ALPHA;
 	}
 
 	uint8_t GetAlpha() const {

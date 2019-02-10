@@ -2,23 +2,22 @@
 #define DISPLAYSERVER_NETWORK_SERVER_H
 
 #include <boost/asio.hpp>
-#include <utility>
-#include "../display/Display.h"
-#include "NetworkPacket.h"
+#include "PacketHandler.h"
 
-class Server {
+class NetworkServer {
 public:
-	Server(boost::shared_ptr<Display> &display, uint16_t port) : _display(display), _port(port) {}
+	NetworkServer(uint16_t port, PacketHandler& packet_handler) : _port(port), _packet_handler(packet_handler) {}
 
 	void StartServerAndBlock();
 
 private:
-	boost::shared_ptr<Display> _display;
 	uint16_t _port;
+	PacketHandler& _packet_handler;
 
 	void HandleClientConnection(boost::asio::ip::tcp::socket &socket);
 
-	void HandlePacket(const Packet &packet);
+	NetworkPacketPtr read_packet(boost::asio::ip::tcp::socket &socket);
+	void write_packet(boost::asio::ip::tcp::socket &socket, const NetworkPacketPtr packet);
 };
 
 #endif //DISPLAYSERVER_NETWORK_SERVER_H

@@ -1,14 +1,15 @@
-#include "../display/Display.h"
 #include "NetworkServer.h"
 
-int main(int argc, char *argv[]) {
-	boost::shared_ptr<Display> display(CreateDisplay());
-	if (!display->Initialize(argc, argv)) {
-		return 1;
+class DummyPacketHandler: public PacketHandler {
+public:
+	const NetworkPacketPtr handle_packet(NetworkPacketPtr request) override {
+		return request;
 	}
+};
 
-	Server networkServer(display, 1236);
-
+int main(int argc, char *argv[]) {
+	DummyPacketHandler packetHandler;
+	NetworkServer networkServer(1236, packetHandler);
 	networkServer.StartServerAndBlock();
 
 	return 0;

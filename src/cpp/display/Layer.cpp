@@ -1,48 +1,47 @@
 #include "Layer.h"
 
-Layer::Layer(uint16_t width, uint16_t height) :
-		_width(width), _height(height), _r(width * height), _g(width * height), _b(width * height), _alpha(255) {
+const Pixel Layer::get_pixel(Point location) const {
+	return is_valid(location) ? _pixels[get_relative_x(location) + (get_relative_y(location)) * this->_width] : Pixel();
 }
 
-void Layer::SetPixel(int x, int y, uint8_t red, uint8_t green, uint8_t blue) {
-	if (x < 0 || x >= _width || y < 0 || y >= _height) {
-		return;
+void Layer::set_pixel(Point location, const Pixel value) {
+	if (is_valid(location)) {
+		_pixels[get_relative_x(location) + (get_relative_y(location)) * this->_width] = value;
 	}
-
-	uint16_t index = _index(static_cast<int16_t>(x), static_cast<int16_t>(y));
-	_r[index] = red;
-	_g[index] = green;
-	_b[index] = blue;
 }
 
-void Layer::Fill(uint8_t red, uint8_t green, uint8_t blue) {
-	std::fill(_r.begin(), _r.end(), red);
-	std::fill(_g.begin(), _g.end(), green);
-	std::fill(_b.begin(), _b.end(), blue);
+void Layer::fill(Pixel value) {
+	std::fill(_pixels.begin(), _pixels.end(), value);
 }
 
-uint8_t Layer::GetRed(int16_t x, int16_t y) const {
-	if (x < 0 || x >= _width || y < 0 || y >= _height) {
-		return 0;
+void Layer::rectangle(Point location, uint16_t width, uint16_t height, Pixel value) {
+	int minX = get_relative_x(location);
+	if (minX >= _width) return;
+	if (minX < 0) minX = 0;
+
+	int maxX = minX + width - 1;
+	if (maxX < 0) return;
+	if (maxX >= _width) maxX = _width - 1;
+
+	int minY = get_relative_y(location);
+	if (minY >= _height) return;
+	if (minY < 0) minY = 0;
+
+	int maxY = minY + height - 1;
+	if (maxY < 0) return;
+	if (maxY >= _height) maxY = _height - 1;
+
+	for (int i = minX; i <= maxX; i++) {
+		for (int j = minY; i < maxY; i++) {
+			_pixels[i + j * _width] = value;
+		}
 	}
-	return _r[_index(x, y)];
 }
 
-uint8_t Layer::GetGreen(int16_t x, int16_t y) const {
-	if (x < 0 || x >= _width || y < 0 || y >= _height) {
-		return 0;
-	}\
-
-	return _g[_index(x, y)];
+void Layer::draw_image(Point location, const ImagePtr &image) {
+	// TODO
 }
 
-uint8_t Layer::GetBlue(int16_t x, int16_t y) const {
-	if (x < 0 || x >= _width || y < 0 || y >= _height) {
-		return 0;
-	}
-	return _b[_index(x, y)];
-}
 
-uint16_t Layer::_index(int16_t x, int16_t y) const {
-	return x + y * this->_width;
-}
+
+

@@ -7,13 +7,20 @@ DisplayServer is a TCP server accepting commands to control a LED matrix display
 To build DisplayServer, the LED Matrix library has to be installed in `$HOME/libs/rpi-rgb-led-matrix`. 
 It can be cloned and built from `https://github.com/hzeller/rpi-rgb-led-matrix`. 
 
-# Server
+## Server
 
 Build the files. 
 Then run either DisplayServerLed or DisplayServerMock. 
 It will start listening on port 1246.
 
-## Client
+## Network packet structure
+
+Each packet consists of
+* The size of the packet (4 bytes).
+* The packet data (size bytes).
+* A CRC32 checksum over size and data.
+
+## Operations
 
 The client library (both C++ and Python) support the following operations:
 * clear()

@@ -1,20 +1,28 @@
-#ifndef DISPLAYSERVER_ERRORS_H
-#define DISPLAYSERVER_ERRORS_H
+#include <utility>
 
-#include <boost/endian/arithmetic.hpp>
+#ifndef DISPLAYSERVER_COMMANDERROR_H
+#define DISPLAYSERVER_COMMANDERROR_H
+
 #include <string>
-#include "Response.h"
+
+enum DisplayErrorCode {
+	LAYER_ALREADY_EXISTS,
+	LAYER_NOT_FOUND,
+	IMAGE_ALREADY_EXISTS,
+};
 
 class DisplayError : public std::exception {
 public:
-	explicit DisplayError(ResponseCode responseCode, std::string message) : _responseCode(responseCode), _message(std::move(message)) {}
+	DisplayError(DisplayErrorCode code, std::string message);
+
+	DisplayErrorCode get_code() const { return _code; }
 
 	const char *what() const noexcept override { return _message.c_str(); }
-	const ResponseCode responseCode() const { return _responseCode; }
 
 private:
+	DisplayErrorCode _code;
 	std::string _message;
-	ResponseCode _responseCode;
 };
 
-#endif //DISPLAYSERVER_ERRORS_H
+
+#endif //DISPLAYSERVER_COMMANDERROR_H
