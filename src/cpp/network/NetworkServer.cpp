@@ -11,6 +11,7 @@ using boost::asio::ip::tcp;
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
+
 void NetworkServer::StartServerAndBlock() {
 	try {
 		boost::asio::io_service io_service;
@@ -30,6 +31,7 @@ void NetworkServer::StartServerAndBlock() {
 
 	std::cout << "Server stopped" << std::endl;
 }
+
 #pragma clang diagnostic pop
 
 void NetworkServer::HandleClientConnection(tcp::socket &socket) {
@@ -64,7 +66,7 @@ NetworkPacketPtr NetworkServer::read_packet(tcp::socket &socket) {
 		boost::throw_exception(NetworkError(MESSAGE_ERROR, "Packet too large"));
 	}
 
-	std::vector<char> data(data_length);
+	std::vector<uint8_t> data(data_length);
 	uint32_t actual_crc;
 	bufs.clear();
 	bufs.push_back(boost::asio::buffer(&data.front(), data_length));
@@ -86,8 +88,8 @@ void NetworkServer::write_packet(boost::asio::ip::tcp::socket &socket, const Net
 	std::vector<boost::asio::mutable_buffer> bufs;
 	boost::system::error_code error;
 
-	uint32_t size = static_cast<uint32_t>(packet->get_data().size());
-	std::vector<char> data = packet->get_data();
+	auto size = static_cast<uint32_t>(packet->get_data().size());
+	std::vector<uint8_t> data = packet->get_data();
 	uint32_t crc = packet->get_crc();
 
 	bufs.push_back(boost::asio::buffer(&size, sizeof(size)));

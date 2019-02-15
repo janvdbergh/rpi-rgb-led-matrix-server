@@ -11,17 +11,16 @@ link_directories(${RPI_RGB_LED_MATRIX_DIR}/lib)
 add_executable(DisplayServerLed
 		command/Command.cpp
 
-#		network/ServerMain.cpp
-#		network/NetworkError.cpp
+		network/ServerMain.cpp
 		network/NetworkPacket.cpp
-#		network/NetworkServer.cpp
+		network/NetworkServer.cpp
 
 		display/Layer.cpp
 		display/LayerMap.cpp
 		datatype/Image.cpp
 		display/ImageMap.cpp
 		display/DisplayError.cpp
-#		display/LedMatrixDisplay.cpp
+		display/LedMatrixDisplay.cpp
 
 		interpreter/ServerCommand.cpp
 

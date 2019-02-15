@@ -35,7 +35,8 @@ void LedMatrixDisplay::show(const LayerMap &layer_set) {
 
 	for (int16_t x = 0; x < ROWS; x++) {
 		for (int16_t y = 0; y < COLUMNS; y++) {
-			Pixel value = layer_set.get_pixel(x, y);
+			Point location(x, y);
+			Pixel value = layer_set.get_pixel(location);
 			_frameCanvas->SetPixel(x, y, value.get_r(), value.get_g(), value.get_b());
 		}
 	}
