@@ -10,24 +10,28 @@ include_directories(
 )
 link_directories(${RPI_RGB_LED_MATRIX_DIR}/lib)
 
+# Display server client library
+add_library(DisplayClient
+		impl/common/Command.cpp
+		impl/common/Image.cpp
+		impl/common/NetworkPacket.cpp
+)
+
 # Display server LED display
 add_executable(DisplayServerLed
 		impl/common/Command.cpp
-
-		impl/server/ServerMain.cpp
+		impl/common/Image.cpp
 		impl/common/NetworkPacket.cpp
-		impl/server/NetworkServer.cpp
 
+		impl/server/DisplayError.cpp
+		impl/server/ExecutionContext.cpp
+		impl/server/ImageMap.cpp
 		impl/server/Layer.cpp
 		impl/server/LayerMap.cpp
-		impl/common/Image.cpp
-		impl/server/ImageMap.cpp
-		impl/server/DisplayError.cpp
 		impl/server/LedMatrixDisplay.cpp
-
+		impl/server/NetworkServer.cpp
 		impl/server/ServerCommand.cpp
-
-		impl/server/ExecutionContext.cpp
+		impl/server/ServerMain.cpp
 )
 target_link_libraries(DisplayServerLed rgbmatrix ${Boost_LIBRARIES} pthread)
 
