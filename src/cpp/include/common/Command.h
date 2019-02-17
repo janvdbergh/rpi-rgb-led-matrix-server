@@ -28,19 +28,17 @@ enum CommandCode {
 
 class Command {
 public:
-	CommandCode get_commandCode() const { return _commandCode; }
+	CommandCode get_command_code() const { return _command_code; }
 
 	virtual NetworkPacketPtr packet() const;
 
 protected:
-	Command() : _commandCode(UNKNOWN) {};
+	Command() : _command_code(UNKNOWN) {};
 
-	explicit Command(CommandCode commandCode) : _commandCode(commandCode) {}
-
-	std::vector<uint8_t> get_command_code_data() const;
+	explicit Command(CommandCode commandCode) : _command_code(commandCode) {}
 
 private:
-	CommandCode _commandCode;
+	CommandCode _command_code;
 };
 
 typedef std::shared_ptr<Command> CommandPtr;
@@ -63,6 +61,8 @@ public:
 
 	uint8_t get_brightness() const { return _brightness; }
 
+	NetworkPacketPtr packet() const override;
+
 private:
 	uint8_t _brightness;
 };
@@ -81,6 +81,8 @@ public:
 
 	uint16_t get_height() const { return _height; }
 
+	NetworkPacketPtr packet() const override;
+
 private:
 	uint8_t _index;
 	Point _offset;
@@ -92,6 +94,8 @@ public:
 	explicit SelectLayerCommand(uint8_t index) : Command(SELECT_LAYER), _index(index) {}
 
 	uint8_t get_index() const { return _index; }
+
+	NetworkPacketPtr packet() const override;
 
 private:
 	uint8_t _index;
@@ -105,6 +109,8 @@ public:
 	Point get_location() const { return _location; }
 
 	Pixel get_value() const { return _value; }
+
+	NetworkPacketPtr packet() const override;
 
 private:
 	Point _location;
@@ -124,6 +130,8 @@ public:
 
 	Pixel get_value() const { return _value; }
 
+	NetworkPacketPtr packet() const override;
+
 private:
 	Point _location;
 	uint16_t _width, _height;
@@ -138,18 +146,22 @@ public:
 
 	ImagePtr get_image() const { return _image; }
 
+	NetworkPacketPtr packet() const override;
 private:
 	std::string _name;
 	ImagePtr _image;
 };
 
-class DrawImageCommand: public Command {
+class DrawImageCommand : public Command {
 public:
-	DrawImageCommand(Point location, std::string name): Command(DRAW_IMAGE), _location(location), _name(std::move(name)) {}
+	DrawImageCommand(Point location, std::string name) : Command(DRAW_IMAGE), _location(location),
+														 _name(std::move(name)) {}
 
 	const Point &get_location() const { return _location; }
 
 	const std::string &get_name() const { return _name; }
+
+	NetworkPacketPtr packet() const override;
 
 private:
 	Point _location;

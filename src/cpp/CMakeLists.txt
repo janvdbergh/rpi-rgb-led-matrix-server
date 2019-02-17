@@ -15,6 +15,8 @@ add_library(DisplayClient
 		impl/common/Command.cpp
 		impl/common/Image.cpp
 		impl/common/NetworkPacket.cpp
+		impl/common/NetworkPacketParser.cpp
+		impl/common/NetworkPacketBuilder.cpp
 )
 set_target_properties(DisplayClient PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION 1)
 install(
@@ -23,6 +25,7 @@ install(
 			include/common/Image.h
 			include/common/NetworkError.h
 			include/common/NetworkPacket.h
+			include/common/NetworkPacketBuilder.h
 			include/common/Pixel.h
 			include/common/Point.h
 		DESTINATION rpi-rgb-led-matrix-server/include
@@ -37,6 +40,8 @@ add_executable(DisplayServerLed
 		impl/common/Command.cpp
 		impl/common/Image.cpp
 		impl/common/NetworkPacket.cpp
+		impl/common/NetworkPacketBuilder.cpp
+		impl/common/NetworkPacketParser.cpp
 
 		impl/server/DisplayError.cpp
 		impl/server/ExecutionContext.cpp
