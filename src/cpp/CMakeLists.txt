@@ -16,6 +16,21 @@ add_library(DisplayClient
 		impl/common/Image.cpp
 		impl/common/NetworkPacket.cpp
 )
+set_target_properties(DisplayClient PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION 1)
+install(
+		FILES
+			include/common/Command.h
+			include/common/Image.h
+			include/common/NetworkError.h
+			include/common/NetworkPacket.h
+			include/common/Pixel.h
+			include/common/Point.h
+		DESTINATION rpi-rgb-led-matrix-server/include
+)
+install(
+		TARGETS DisplayClient
+		DESTINATION rpi-rgb-led-matrix-server/lib
+)
 
 # Display server LED display
 add_executable(DisplayServerLed
@@ -33,9 +48,8 @@ add_executable(DisplayServerLed
 		impl/server/ServerCommand.cpp
 		impl/server/ServerMain.cpp
 )
+set_target_properties(DisplayServerLed PROPERTIES VERSION ${PROJECT_VERSION})
 target_link_libraries(DisplayServerLed rgbmatrix ${Boost_LIBRARIES} pthread)
-
-# Installation of server
 install(
 		TARGETS DisplayServerLed
 		DESTINATION rpi-rgb-led-matrix-server/bin
