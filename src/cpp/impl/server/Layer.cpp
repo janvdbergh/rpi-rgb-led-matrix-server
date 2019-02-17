@@ -39,7 +39,11 @@ void Layer::rectangle(Point location, uint16_t width, uint16_t height, Pixel val
 }
 
 void Layer::draw_image(Point location, const ImagePtr &image) {
-	// TODO
+	for (int y = 0; y < image->get_height(); y++) {
+		for (int x = 0; x < image->get_width(); x++) {
+			set_pixel(Point(static_cast<int16_t>(location.get_x() + x), static_cast<int16_t>(location.get_x() + y)), image->get_pixel(x, y));
+		}
+	}
 }
 
 
