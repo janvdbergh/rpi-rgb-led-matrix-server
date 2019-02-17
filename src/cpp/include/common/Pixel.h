@@ -1,6 +1,8 @@
 #ifndef DISPLAYSERVER_PIXEL_H
 #define DISPLAYSERVER_PIXEL_H
 
+#include <stdint.h>
+
 class Pixel {
 public:
 private:

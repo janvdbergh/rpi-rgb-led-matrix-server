@@ -5,6 +5,7 @@
 
 #include <vector>
 #include <string>
+#include <memory>
 
 const uint32_t MAX_PACKET_SIZE = 8192 * 8;
 
