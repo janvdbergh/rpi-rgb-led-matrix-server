@@ -51,6 +51,7 @@ add_executable(DisplayServerLed
 		impl/server/LedMatrixDisplay.cpp
 		impl/server/NetworkServer.cpp
 		impl/server/ServerCommand.cpp
+		impl/server/DisplayServerPacketHandler.cpp
 		impl/server/ServerMain.cpp
 )
 set_target_properties(DisplayServerLed PROPERTIES VERSION ${PROJECT_VERSION})

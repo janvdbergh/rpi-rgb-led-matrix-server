@@ -1,15 +1,13 @@
 #include <server/NetworkServer.h>
-
-class DummyPacketHandler: public PacketHandler {
-public:
-	const NetworkPacketPtr handle_packet(NetworkPacketPtr request) override {
-		return request;
-	}
-};
+#include <server/LedMatrixDisplay.h>
+#include <server/DisplayServerPacketHandler.h>
 
 int main(int argc, char *argv[]) {
-	DummyPacketHandler packetHandler;
-	NetworkServer networkServer(1236, packetHandler);
+	LedMatrixDisplay ledMatrixDisplay;
+	ledMatrixDisplay.initialize(argc, argv);
+
+	DisplayServerPacketHandler displayServerPacketHandler(ledMatrixDisplay);
+	NetworkServer networkServer(1236, displayServerPacketHandler);
 	networkServer.StartServerAndBlock();
 
 	return 0;

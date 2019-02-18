@@ -5,8 +5,7 @@
 #include <common/Pixel.h>
 #include <common/Image.h>
 #include <common/NetworkPacket.h>
-
-const uint8_t COMMAND_PREFIX = 0xC0;
+#include "NetworkPacketParser.h"
 
 enum CommandCode {
 	UNKNOWN = 0xff,
@@ -40,9 +39,6 @@ protected:
 private:
 	CommandCode _command_code;
 };
-
-typedef std::shared_ptr<Command> CommandPtr;
-
 
 class ResetCommand : public Command {
 public:
@@ -168,39 +164,38 @@ private:
 	std::string _name;
 };
 
-template<class CommandPtr>
+template<class CommandType>
 class CommandFactory {
 public:
-	virtual CommandPtr create_reset_command() const = 0;
+	virtual std::shared_ptr<const CommandType> create_reset_command() const = 0;
 
-	virtual CommandPtr create_show_command() const = 0;
+	virtual std::shared_ptr<const CommandType> create_show_command() const = 0;
 
-	virtual CommandPtr create_set_brightness_command(uint8_t brightness) const = 0;
+	virtual std::shared_ptr<const CommandType> create_set_brightness_command(uint8_t brightness) const = 0;
 
-	virtual CommandPtr create_create_layer_command(uint8_t index, Point offset, uint16_t width,
+	virtual std::shared_ptr<const CommandType> create_create_layer_command(uint8_t index, Point offset, uint16_t width,
 												   uint16_t height) const = 0;
 
-	virtual CommandPtr create_select_layer_command(uint8_t index) const = 0;
+	virtual std::shared_ptr<const CommandType> create_select_layer_command(uint8_t index) const = 0;
 
-	virtual CommandPtr create_draw_pixel_command(Point location, Pixel value) const = 0;
+	virtual std::shared_ptr<const CommandType> create_draw_pixel_command(Point location, Pixel value) const = 0;
 
-	virtual CommandPtr create_draw_rectangle_command(Point location, uint16_t width, uint16_t height, Pixel value) const = 0;
+	virtual std::shared_ptr<const CommandType> create_draw_rectangle_command(Point location, uint16_t width, uint16_t height, Pixel value) const = 0;
 
-	virtual CommandPtr create_define_image_command(const std::string &name, ImagePtr image) const = 0;
+	virtual std::shared_ptr<const CommandType> create_define_image_command(const std::string &name, ImagePtr image) const = 0;
 
-	virtual CommandPtr create_draw_image_command(Point location, const std::string &name) const = 0;
+	virtual std::shared_ptr<const CommandType> create_draw_image_command(Point location, const std::string &name) const = 0;
 };
 
-
-template<class CommandPtr>
+template<class CommandType>
 class CommandReader {
 public:
-	explicit CommandReader(const CommandFactory<CommandPtr> &commandFactory) : _commandFactory(commandFactory) {}
+	explicit CommandReader(const std::shared_ptr<CommandFactory<CommandType>> commandFactory) : _commandFactory(commandFactory) {}
 
-	CommandPtr read_command(NetworkPacketPtr packet);
+	std::shared_ptr<const CommandType> read_command(NetworkPacketPtr packet);
 
 private:
-	CommandFactory<CommandPtr> _commandFactory;
+	std::shared_ptr<CommandFactory<CommandType>> _commandFactory;
 };
 
 class CommandError : public std::exception {
@@ -212,5 +207,50 @@ public:
 private:
 	std::string _message;
 };
+
+template<class CommandType>
+std::shared_ptr<const CommandType> CommandReader<CommandType>::read_command(NetworkPacketPtr packet) {
+	NetworkPacketParser parser(std::move(packet));
+
+	uint8_t command_code = parser.read_uint8();
+	std::shared_ptr<const CommandType> result;
+	switch (command_code) {
+		case RESET:
+			result = _commandFactory->create_reset_command();
+			break;
+		case SHOW:
+			result = _commandFactory->create_show_command();
+			break;
+		case SET_BRIGHTNESS:
+			result = _commandFactory->create_set_brightness_command(parser.read_uint8());
+			break;
+		case CREATE_LAYER:
+			result = _commandFactory->create_create_layer_command(parser.read_uint8(), parser.read_point(),
+																  parser.read_uint16(), parser.read_uint16());
+			break;
+		case SELECT_LAYER:
+			result = _commandFactory->create_select_layer_command(parser.read_uint8());
+			break;
+		case DRAW_PIXEL:
+			result = _commandFactory->create_draw_pixel_command(parser.read_point(), parser.read_pixel());
+			break;
+		case DRAW_RECTANGLE:
+			result = _commandFactory->create_draw_rectangle_command(parser.read_point(),
+																	parser.read_uint16(), parser.read_uint16(),
+																	parser.read_pixel());
+			break;
+		case DEFINE_IMAGE:
+			result = _commandFactory->create_define_image_command(parser.read_string(), parser.read_image());
+			break;
+		case DRAW_IMAGE:
+			result = _commandFactory->create_draw_image_command(parser.read_point(), parser.read_string());
+			break;
+		default:
+			boost::throw_exception(CommandError("Unknown command type"));
+	}
+	parser.ensure_at_end();
+
+	return result;
+}
 
 #endif //DISPLAYSERVER_COMMAND_H

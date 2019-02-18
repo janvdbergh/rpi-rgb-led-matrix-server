@@ -1,13 +1,9 @@
-#include <utility>
-
-#include <utility>
-
 #ifndef DISPLAYSERVER_SERVERCOMMAND_H
 #define DISPLAYSERVER_SERVERCOMMAND_H
 
 #include <cstdint>
 #include <common/Command.h>
-#include "ExecutionContext.h"
+#include <server/ExecutionContext.h>
 
 class ExecutionContext;
 
@@ -19,8 +15,7 @@ protected:
 	ServerCommand() = default;
 };
 
-typedef boost::shared_ptr<const ServerCommand> ServerCommandPtr;
-
+typedef std::shared_ptr<const ServerCommand> ServerCommandPtr;
 
 class ServerResetCommand : public ServerCommand, public ResetCommand {
 public:
@@ -88,14 +83,9 @@ public:
 	ServerDrawImageCommand(Point location, const std::string &name) : DrawImageCommand(location, name) {}
 
 	void execute(ExecutionContext &context) const override;
-
-private:
-	int16_t _x, _y;
-	std::string _name;
 };
 
-
-class ServerCommandFactory : public CommandFactory<ServerCommandPtr> {
+class ServerCommandFactory : public CommandFactory<ServerCommand> {
 public:
 	ServerCommandPtr create_reset_command() const override;
 
@@ -103,20 +93,17 @@ public:
 
 	ServerCommandPtr create_set_brightness_command(uint8_t brightness) const override;
 
-	ServerCommandPtr
-	create_create_layer_command(uint8_t index, Point offset, uint16_t width, uint16_t height) const override;
+	ServerCommandPtr create_create_layer_command(uint8_t index, Point offset, uint16_t width, uint16_t height) const override;
 
 	ServerCommandPtr create_select_layer_command(uint8_t index) const override;
 
 	ServerCommandPtr create_draw_pixel_command(Point location, Pixel value) const override;
 
-	ServerCommandPtr
-	create_draw_rectangle_command(Point location, uint16_t width, uint16_t height, Pixel value) const override;
+	ServerCommandPtr create_draw_rectangle_command(Point location, uint16_t width, uint16_t height, Pixel value) const override;
 
 	ServerCommandPtr create_define_image_command(const std::string &name, ImagePtr image) const override;
 
 	ServerCommandPtr create_draw_image_command(Point location, const std::string &name) const override;
-
 };
 
 #endif //DISPLAYSERVER_SERVERCOMMAND_H
