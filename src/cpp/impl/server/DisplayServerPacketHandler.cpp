@@ -4,5 +4,5 @@ const NetworkPacketPtr DisplayServerPacketHandler::handle_packet(NetworkPacketPt
 	ServerCommandPtr command = _commandReader.read_command(request);
 	command->execute(_executionContext);
 
-	return NetworkPacketPtr();
+	return NetworkPacketPtr(new NetworkPacket());
 }

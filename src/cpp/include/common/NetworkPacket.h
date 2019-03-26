@@ -1,5 +1,7 @@
 #include <utility>
 
+#include <utility>
+
 #ifndef DISPLAYSERVER_PACKET_H
 #define DISPLAYSERVER_PACKET_H
 
@@ -11,6 +13,7 @@ const uint32_t MAX_PACKET_SIZE = 8192 * 8;
 
 class NetworkPacket {
 public:
+	NetworkPacket() : _data() {}
 	explicit NetworkPacket(std::vector<uint8_t> _data) : _data(std::move(_data)) {}
 
 	const std::vector<uint8_t> &get_data() const { return _data; }
